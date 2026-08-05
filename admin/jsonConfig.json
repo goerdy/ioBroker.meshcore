@@ -1,0 +1,101 @@
+{
+	"i18n": true,
+	"type": "panel",
+	"items": {
+		"serialPort": {
+			"type": "selectSendTo",
+			"label": "Serial port",
+			"newLine": true,
+			"command": "listSerialPorts",
+			"manual": true,
+			"showAllValues": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 8,
+			"lg": 6,
+			"xl": 6
+		},
+		"monitorPublicChannel": {
+			"type": "checkbox",
+			"label": "Store public channel messages",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
+		},
+		"subscribedChannels": {
+			"type": "selectSendTo",
+			"label": "Additional subscribed channels",
+			"command": "listKnownChannels",
+			"manual": true,
+			"multiple": true,
+			"showAllValues": true,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 8,
+			"lg": 6,
+			"xl": 6
+		},
+		"syncTimeOnConnect": {
+			"type": "checkbox",
+			"label": "Sync device time on connect",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
+		},
+		"messagePollIntervalSeconds": {
+			"type": "number",
+			"label": "Message poll fallback in seconds",
+			"min": 0,
+			"step": 1,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 3
+		},
+		"statsRefreshMinutes": {
+			"type": "number",
+			"label": "Refresh metadata every X minutes",
+			"min": 0,
+			"step": 1,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 3
+		},
+		"reconnectDelaySeconds": {
+			"type": "number",
+			"label": "Reconnect delay in seconds",
+			"min": 5,
+			"step": 1,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 3
+		},
+		"maxHistoryEntries": {
+			"type": "number",
+			"label": "Maximum stored messages per branch",
+			"min": 1,
+			"step": 1,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 3
+		}
+	}
+}

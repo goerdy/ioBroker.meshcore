@@ -1,0 +1,152 @@
+{
+	"common": {
+		"name": "meshcore",
+		"version": "0.0.1",
+		"news": {
+			"0.0.1": {
+				"en": "initial release",
+				"de": "Erstveröffentlichung",
+				"ru": "Начальная версия",
+				"pt": "lançamento inicial",
+				"nl": "Eerste uitgave",
+				"fr": "Première version",
+				"it": "Versione iniziale",
+				"es": "Versión inicial",
+				"pl": "Pierwsze wydanie",
+				"uk": "Початкова версія",
+				"zh-cn": "首次出版"
+			}
+		},
+		"titleLang": {
+			"en": "MeshCore",
+			"de": "MeshCore",
+			"ru": "MeshCore",
+			"pt": "MalhaCore",
+			"nl": "MeshCore",
+			"fr": "Noyau maillé",
+			"it": "MeshCore",
+			"es": "Núcleo de malla",
+			"pl": "SiatkaCore",
+			"uk": "MeshCore",
+			"zh-cn": "网状核心"
+		},
+		"desc": {
+			"en": "MeshCore companion adapter for ioBroker",
+			"de": "MeshCore-Begleitadapter für ioBroker",
+			"ru": "Сопутствующий адаптер MeshCore для ioBroker",
+			"pt": "Adaptador complementar MeshCore para ioBroker",
+			"nl": "MeshCore begeleidende adapter voor ioBroker",
+			"fr": "Adaptateur compagnon MeshCore pour ioBroker",
+			"it": "Adattatore complementare MeshCore per ioBroker",
+			"es": "Adaptador complementario MeshCore para ioBroker",
+			"pl": "Adapter towarzyszący MeshCore dla ioBroker",
+			"uk": "Супутній адаптер MeshCore для ioBroker",
+			"zh-cn": "ioBroker 的 MeshCore 配套适配器"
+		},
+		"authors": [
+			"goerdy <goerdy@example.com>"
+		],
+		"keywords": [
+			"meshcore",
+			"lora",
+			"serial",
+			"messaging"
+		],
+		"licenseInformation": {
+			"type": "free",
+			"license": "MIT"
+		},
+		"platform": "Javascript/Node.js",
+		"icon": "meshcore.png",
+		"enabled": true,
+		"extIcon": "https://raw.githubusercontent.com/goerdy/ioBroker.MeshCore/main/admin/meshcore.png",
+		"readme": "https://github.com/goerdy/ioBroker.MeshCore/blob/main/README.md",
+		"loglevel": "info",
+		"tier": 3,
+		"mode": "daemon",
+		"type": "protocols",
+		"compact": true,
+		"messagebox": true,
+		"connectionType": "local",
+		"dataSource": "push",
+		"adminUI": {
+			"config": "json"
+		},
+		"dependencies": [
+			{
+				"js-controller": ">=6.0.11"
+			}
+		],
+		"globalDependencies": [
+			{
+				"admin": ">=7.0.23"
+			}
+		]
+	},
+	"native": {
+		"serialPort": "",
+		"monitorPublicChannel": true,
+		"subscribedChannels": [],
+		"syncTimeOnConnect": true,
+		"messagePollIntervalSeconds": 30,
+		"statsRefreshMinutes": 5,
+		"reconnectDelaySeconds": 15,
+		"maxHistoryEntries": 50
+	},
+	"objects": [],
+	"instanceObjects": [
+		{
+			"_id": "info",
+			"type": "channel",
+			"common": {
+				"name": "Information"
+			},
+			"native": {}
+		},
+		{
+			"_id": "info.connection",
+			"type": "state",
+			"common": {
+				"role": "indicator.connected",
+				"name": "Device or service connected",
+				"type": "boolean",
+				"read": true,
+				"write": false,
+				"def": false
+			},
+			"native": {}
+		},
+		{
+			"_id": "meta",
+			"type": "channel",
+			"common": {
+				"name": "Metadata"
+			},
+			"native": {}
+		},
+		{
+			"_id": "channels",
+			"type": "channel",
+			"common": {
+				"name": "Channel messages"
+			},
+			"native": {}
+		},
+		{
+			"_id": "private",
+			"type": "channel",
+			"common": {
+				"name": "Private messages"
+			},
+			"native": {}
+		},
+		{
+			"_id": "commands",
+			"type": "channel",
+			"common": {
+				"name": "Commands"
+			},
+			"native": {}
+		}
+	]
+}
