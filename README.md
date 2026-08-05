@@ -78,11 +78,17 @@ chgrp dialout /dev/ttyACM0
 chmod 660 /dev/ttyACM0
 ```
 
+The ioBroker runtime user also needs to be a member of the `dialout` group, for example:
+
+```bash
+usermod -aG dialout iobroker
+```
+
 This fixed the issue in a Proxmox LXC setup where the USB serial device had already been passed through to the container.
 
 Notes:
 
-- The ioBroker runtime user should usually be a member of `dialout`.
+- After changing group membership, a restart of the ioBroker service or container is usually required.
 - In Proxmox LXC, device passthrough alone may not be enough if the device permissions inside the container are still too restrictive.
 - `/dev/ttyACM0` may change after reconnects or reboots. If available, a stable path under `/dev/serial/by-id/` is usually the better choice.
 
