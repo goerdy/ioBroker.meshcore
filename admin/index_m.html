@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MeshCore</title>
+	<link rel="stylesheet" type="text/css" href="../../css/adapter.css">
+	<script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="../../js/translate.js"></script>
+	<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+	<style>
+		:root {
+			--bg: #f3f5f7;
+			--card: #fff;
+			--text: #1a232d;
+			--muted: #5f6c79;
+			--line: #d7dde4;
+			--accent: #0d8a73;
+			--accent-dark: #0d5d66;
+			--ok: #166534;
+			--warn: #9a6700;
+			--error: #b42318;
+		}
+
+		body {
+			margin: 0;
+			font-family: "Segoe UI", Arial, sans-serif;
+			background:
+				radial-gradient(circle at top left, rgba(13, 138, 115, 0.12), transparent 24%),
+				linear-gradient(180deg, #fafbfc 0%, var(--bg) 100%);
+			color: var(--text);
+		}
+
+		.page {
+			max-width: 1240px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.hero,
+		.card {
+			background: var(--card);
+			border: 1px solid rgba(26, 35, 45, 0.08);
+			border-radius: 20px;
+			box-shadow: 0 16px 40px rgba(26, 35, 45, 0.08);
+		}
+
+		.hero {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			gap: 16px;
+			align-items: center;
+			padding: 20px 24px;
+			margin-bottom: 18px;
+		}
+
+		.hero h1 {
+			margin: 0 0 6px;
+			font-size: 28px;
+		}
+
+		.hero p,
+		.muted {
+			margin: 0;
+			color: var(--muted);
+			line-height: 1.45;
+		}
+
+		.notice,
+		.status {
+			border-radius: 14px;
+			padding: 14px 16px;
+			margin-bottom: 16px;
+		}
+
+		.notice {
+			background: #fff8e6;
+			border: 1px solid rgba(154, 103, 0, 0.2);
+			color: var(--warn);
+		}
+
+		.status {
+			display: none;
+			font-weight: 600;
+		}
+
+		.status.show {
+			display: block;
+		}
+
+		.status.info {
+			background: #e8f2ff;
+			color: #0d47a1;
+		}
+
+		.status.success {
+			background: #eaf7ed;
+			color: var(--ok);
+		}
+
+		.status.error {
+			background: #fdecec;
+			color: var(--error);
+		}
+
+		.tabs {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-bottom: 16px;
+		}
+
+		.tab-button,
+		.action-button {
+			border: 0;
+			border-radius: 12px;
+			padding: 11px 16px;
+			font: inherit;
+			cursor: pointer;
+			transition: transform 0.12s ease, opacity 0.12s ease;
+		}
+
+		.tab-button {
+			background: #e5ebef;
+			color: var(--text);
+			font-weight: 600;
+		}
+
+		.tab-button.active,
+		.action-button.primary {
+			background: var(--accent);
+			color: #fff;
+		}
+
+		.action-button.secondary {
+			background: #e5ebef;
+			color: var(--text);
+		}
+
+		.tab-button:hover,
+		.action-button:hover {
+			transform: translateY(-1px);
+		}
+
+		.panel {
+			display: none;
+		}
+
+		.panel.active {
+			display: block;
+		}
+
+		.card {
+			padding: 20px;
+			margin-bottom: 18px;
+		}
+
+		.grid-2,
+		.info-grid,
+		.form-grid {
+			display: grid;
+			gap: 16px;
+		}
+
+		.grid-2 {
+			grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+		}
+
+		.info-grid {
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		}
+
+		.form-grid {
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		}
+
+		.field label {
+			display: block;
+			font-weight: 700;
+			margin-bottom: 7px;
+		}
+
+		.field input,
+		.field textarea,
+		.field select {
+			width: 100%;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			padding: 11px 12px;
+			font: inherit;
+			background: #fff;
+			color: var(--text);
+		}
+
+		.field textarea {
+			min-height: 88px;
+			resize: vertical;
+		}
+
+		.field small {
+			display: block;
+			margin-top: 6px;
+			color: var(--muted);
+			line-height: 1.4;
+		}
+
+		.checkbox-row {
+			display: flex;
+			align-items: flex-start;
+			gap: 10px;
+			padding-top: 30px;
+		}
+
+		.checkbox-row input {
+			margin-top: 4px;
+		}
+
+		.metrics .metric {
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			background: #fbfcfd;
+			padding: 14px;
+		}
+
+		.metric .label {
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--muted);
+			margin-bottom: 6px;
+		}
+
+		.metric .value {
+			word-break: break-word;
+		}
+
+		.mono {
+			font-family: Consolas, Menlo, Monaco, monospace;
+		}
+
+		.toolbar {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			align-items: center;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		th,
+		td {
+			padding: 12px 10px;
+			border-bottom: 1px solid var(--line);
+			text-align: left;
+			vertical-align: top;
+		}
+
+		th {
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--muted);
+		}
+
+		.clickable-row {
+			cursor: pointer;
+		}
+
+		.clickable-row:hover {
+			background: rgba(13, 138, 115, 0.05);
+		}
+
+		.pill {
+			display: inline-flex;
+			padding: 4px 9px;
+			border-radius: 999px;
+			font-size: 12px;
+			font-weight: 700;
+			background: #edf1f4;
+			color: var(--muted);
+		}
+
+		.pill.ok {
+			background: #e5f5ea;
+			color: var(--ok);
+		}
+
+		.qr-box {
+			display: grid;
+			justify-items: center;
+			gap: 12px;
+			padding: 18px;
+			border: 1px dashed rgba(13, 138, 115, 0.35);
+			border-radius: 16px;
+			background: linear-gradient(180deg, rgba(13, 138, 115, 0.06), rgba(13, 138, 115, 0.02));
+		}
+
+		.qr-box img {
+			max-width: 280px;
+			width: 100%;
+			background: #fff;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			padding: 8px;
+		}
+
+		.code-block {
+			margin-top: 14px;
+			padding: 12px;
+			border: 1px solid var(--line);
+			border-radius: 14px;
+			background: #f8fafb;
+			max-height: 180px;
+			overflow: auto;
+			white-space: pre-wrap;
+			word-break: break-word;
+		}
+	</style>
+</head>
+<body>
+	<div class="page">
+		<section class="hero">
+			<div>
+				<h1>MeshCore</h1>
+				<p>Serial connection setup, channel subscriptions, live overview, contact QR export, and direct channel provisioning inside the normal adapter instance configuration.</p>
+			</div>
+			<div class="toolbar">
+				<a class="action-button secondary" href="https://github.com/goerdy/ioBroker.meshcore" target="_blank" rel="noreferrer">GitHub Help</a>
+			</div>
+		</section>
+
+		<div class="notice">
+			This adapter currently runs as a test version, but it is still rough, vibe-coded, and not human-reviewed. Treat it as alpha-grade murks.
+		</div>
+
+		<div id="globalStatus" class="status info"></div>
+
+		<div class="tabs">
+			<button type="button" class="tab-button active" data-target="settingsPanel">Settings</button>
+			<button type="button" class="tab-button" data-target="overviewPanel">Overview</button>
+		</div>
+
+		<section id="settingsPanel" class="panel active">
+			<div class="card">
+				<h2>Connection</h2>
+				<div class="grid-2">
+					<div class="field">
+						<label for="serialPort">Serial device</label>
+						<div class="toolbar" style="margin-bottom:10px;">
+							<select id="serialPort" class="value" data-native="serialPort"></select>
+							<button type="button" class="action-button secondary" id="refreshPortsButton">Refresh ports</button>
+						</div>
+						<small>Use a stable path under <span class="mono">/dev/serial/by-id/</span> when available. Manual values are allowed if the dropdown misses your device.</small>
+						<input id="serialPortManual" type="text" placeholder="Optional manual serial path, e.g. /dev/serial/by-id/...">
+					</div>
+
+					<div class="field">
+						<label for="subscribedChannels">Additional channel subscriptions</label>
+						<textarea id="subscribedChannels" class="value" data-native="subscribedChannels" placeholder="One entry per line, channel index or exact channel name"></textarea>
+						<small>Examples: <span class="mono">1</span>, <span class="mono">ops</span>, <span class="mono">3</span>. These channels are monitored and stored in the object tree.</small>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<h2>Behavior</h2>
+				<div class="form-grid">
+					<div class="field checkbox-row">
+						<input id="monitorPublicChannel" class="value" data-native="monitorPublicChannel" type="checkbox">
+						<div>
+							<label for="monitorPublicChannel">Store public channel messages</label>
+							<small>Keep channel 0 history in the object tree.</small>
+						</div>
+					</div>
+
+					<div class="field checkbox-row">
+						<input id="syncTimeOnConnect" class="value" data-native="syncTimeOnConnect" type="checkbox">
+						<div>
+							<label for="syncTimeOnConnect">Sync device time on connect</label>
+							<small>Pushes host time to the MeshCore device after connecting.</small>
+						</div>
+					</div>
+
+					<div class="field">
+						<label for="messagePollIntervalSeconds">Fallback message poll interval in seconds</label>
+						<input id="messagePollIntervalSeconds" class="value" data-native="messagePollIntervalSeconds" type="number" min="0" step="1">
+					</div>
+
+					<div class="field">
+						<label for="statsRefreshMinutes">Metadata refresh interval in minutes</label>
+						<input id="statsRefreshMinutes" class="value" data-native="statsRefreshMinutes" type="number" min="0" step="1">
+					</div>
+
+					<div class="field">
+						<label for="reconnectDelaySeconds">Reconnect delay in seconds</label>
+						<input id="reconnectDelaySeconds" class="value" data-native="reconnectDelaySeconds" type="number" min="5" step="1">
+					</div>
+
+					<div class="field">
+						<label for="maxHistoryEntries">Stored messages per branch</label>
+						<input id="maxHistoryEntries" class="value" data-native="maxHistoryEntries" type="number" min="1" step="1">
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<h2>Serial Permission Hint</h2>
+				<p class="muted">If the device shows up but the adapter still logs <span class="mono">Permission denied</span>, the ioBroker user usually needs access to the serial device and membership in <span class="mono">dialout</span>.</p>
+				<div class="code-block mono">chgrp dialout /dev/ttyACM0
+chmod 660 /dev/ttyACM0
+usermod -aG dialout iobroker</div>
+			</div>
+		</section>
+
+		<section id="overviewPanel" class="panel">
+			<div class="card">
+				<div class="toolbar" style="justify-content:space-between; margin-bottom:12px;">
+					<div>
+						<h2 style="margin:0 0 4px;">Live Overview</h2>
+						<p class="muted">Reads current MeshCore data from the running adapter instance.</p>
+					</div>
+					<button type="button" class="action-button primary" id="refreshOverviewButton">Refresh overview</button>
+				</div>
+				<div id="overviewStatus" class="status info"></div>
+				<div id="deviceMetrics" class="info-grid metrics"></div>
+			</div>
+
+			<div class="card">
+				<h2>Identity and QR</h2>
+				<div class="grid-2">
+					<div id="identityMetrics" class="info-grid metrics"></div>
+					<div class="qr-box">
+						<img id="qrImage" alt="MeshCore QR code" style="display:none;">
+						<div id="qrFallback" class="muted">No QR export available yet. The adapter must be connected to a real MeshCore device.</div>
+					</div>
+				</div>
+				<div id="qrPayload" class="code-block mono">No contact export available yet.</div>
+			</div>
+
+			<div class="card">
+				<h2>Configured Channels</h2>
+				<p class="muted">Click a row to prefill the form below.</p>
+				<div style="overflow:auto;">
+					<table>
+						<thead>
+							<tr>
+								<th>Index</th>
+								<th>Name</th>
+								<th>Subscribed</th>
+								<th>Secret</th>
+							</tr>
+						</thead>
+						<tbody id="channelsTableBody"></tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="card">
+				<h2>Add or Update Channel</h2>
+				<p class="muted">This writes the channel directly to the MeshCore device. If you also want storage for that channel, add it in the Settings tab under subscriptions.</p>
+				<form id="channelForm">
+					<div class="form-grid">
+						<div class="field">
+							<label for="channelIdx">Channel index</label>
+							<input id="channelIdx" type="number" min="1" step="1" required>
+						</div>
+						<div class="field">
+							<label for="channelName">Channel name</label>
+							<input id="channelName" type="text" maxlength="64" required>
+						</div>
+						<div class="field" style="grid-column: 1 / -1;">
+							<label for="channelSecret">Channel secret</label>
+							<textarea id="channelSecret" placeholder="Optional hex string. Leave empty for auto-generated secret."></textarea>
+						</div>
+					</div>
+					<div class="toolbar" style="margin-top:14px;">
+						<button type="submit" class="action-button primary" id="saveChannelButton">Save channel</button>
+						<button type="button" class="action-button secondary" id="clearChannelButton">Clear form</button>
+					</div>
+				</form>
+			</div>
+		</section>
+	</div>
+
+	<script>
+		let currentOverview = null;
+		let currentOnChange = null;
+
+		function setStatus(id, type, text) {
+			const el = document.getElementById(id);
+			el.className = `status show ${type}`;
+			el.textContent = text;
+		}
+
+		function clearStatus(id) {
+			const el = document.getElementById(id);
+			el.className = 'status info';
+			el.textContent = '';
+		}
+
+		function adapterInstanceId() {
+			return `${adapter}.${instance}`;
+		}
+
+		function callAdapter(command, message) {
+			return new Promise((resolve, reject) => {
+				const callback = response => {
+					if (response && response.error) {
+						reject(new Error(response.error));
+						return;
+					}
+					resolve(response);
+				};
+
+				try {
+					if (typeof sendTo === 'function') {
+						sendTo(adapterInstanceId(), command, message, callback);
+						return;
+					}
+
+					if (socket && typeof socket.emit === 'function') {
+						socket.emit('sendTo', adapterInstanceId(), command, message, callback);
+						return;
+					}
+
+					reject(new Error('No admin adapter bridge available'));
+				} catch (error) {
+					reject(error);
+				}
+			});
+		}
+
+		function normalizeSubscriptions(value) {
+			if (Array.isArray(value)) {
+				return value.join('\n');
+			}
+			return String(value || '');
+		}
+
+		function parseSubscriptions(value) {
+			return String(value || '')
+				.split(/[\n,;]+/g)
+				.map(entry => entry.trim())
+				.filter(Boolean);
+		}
+
+		function metric(label, value, mono) {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'metric';
+
+			const labelEl = document.createElement('div');
+			labelEl.className = 'label';
+			labelEl.textContent = label;
+			wrapper.appendChild(labelEl);
+
+			const valueEl = document.createElement('div');
+			valueEl.className = `value${mono ? ' mono' : ''}`;
+			valueEl.textContent = value || 'n/a';
+			wrapper.appendChild(valueEl);
+
+			return wrapper;
+		}
+
+		function textValue(obj, keys) {
+			for (const key of keys) {
+				const value = obj && obj[key];
+				if (value !== undefined && value !== null && String(value).trim() !== '') {
+					return String(value);
+				}
+			}
+			return '';
+		}
+
+		async function refreshPorts(selectedValue) {
+			try {
+				const ports = await callAdapter('listSerialPorts', {});
+				const select = document.getElementById('serialPort');
+				const manualValue = document.getElementById('serialPortManual').value.trim();
+				const wanted = manualValue || selectedValue || select.value;
+
+				select.innerHTML = '';
+
+				const empty = document.createElement('option');
+				empty.value = '';
+				empty.textContent = 'Select a serial device';
+				select.appendChild(empty);
+
+				(ports || []).forEach(port => {
+					const option = document.createElement('option');
+					option.value = port.value;
+					option.textContent = port.label;
+					select.appendChild(option);
+				});
+
+				if (wanted) {
+					const exists = [...select.options].some(option => option.value === wanted);
+					if (!exists) {
+						const manualOption = document.createElement('option');
+						manualOption.value = wanted;
+						manualOption.textContent = `${wanted} (manual)`;
+						select.appendChild(manualOption);
+					}
+					select.value = wanted;
+				}
+			} catch (error) {
+				setStatus('globalStatus', 'error', `Could not load serial ports: ${error.message || error}`);
+			}
+		}
+
+		function renderOverview(data) {
+			currentOverview = data || {};
+			const self = currentOverview.self || {};
+			const device = currentOverview.device || {};
+			const stats = currentOverview.stats || {};
+			const qr = currentOverview.qr || {};
+
+			const deviceMetrics = document.getElementById('deviceMetrics');
+			deviceMetrics.replaceChildren(
+				metric('Instance', adapterInstanceId(), true),
+				metric('Connection', currentOverview.connected ? 'Connected' : 'Disconnected'),
+				metric('Configured port', currentOverview.configuredPort || ''),
+				metric('Device name', textValue(self, ['advName', 'name', 'displayName'])),
+				metric('Public key', qr.publicKey || textValue(self, ['publicKey', 'public_key', 'pubKey']), true),
+				metric('Device type', textValue(device, ['deviceType', 'type', 'boardType'])),
+				metric('Firmware', textValue(device, ['firmwareVersion', 'version', 'fwVersion'])),
+				metric('Protocol', textValue(device, ['protocolVersion', 'companionProtocolVersion'])),
+				metric('Battery mV', textValue(stats, ['batteryMilliVolts'])),
+				metric('Last error', currentOverview.lastError || '')
+			);
+
+			const identityMetrics = document.getElementById('identityMetrics');
+			identityMetrics.replaceChildren(
+				metric('Advert name', textValue(self, ['advName', 'name', 'displayName'])),
+				metric('Public key', qr.publicKey || textValue(self, ['publicKey', 'public_key', 'pubKey']), true),
+				metric('Advert export', qr.advertHex || '', true),
+				metric('Contacts cached', String((currentOverview.contacts || []).length)),
+				metric('Channels cached', String((currentOverview.channels || []).length))
+			);
+
+			const qrImage = document.getElementById('qrImage');
+			const qrFallback = document.getElementById('qrFallback');
+			if (qr.dataUrl) {
+				qrImage.src = qr.dataUrl;
+				qrImage.style.display = 'block';
+				qrFallback.style.display = 'none';
+			} else {
+				qrImage.style.display = 'none';
+				qrFallback.style.display = 'block';
+			}
+
+			document.getElementById('qrPayload').textContent = qr.payload
+				? `QR payload\n${qr.payload}\n\nAdvert hex\n${qr.advertHex || 'n/a'}`
+				: 'No contact export available yet.';
+
+			const tbody = document.getElementById('channelsTableBody');
+			tbody.innerHTML = '';
+			const channels = Array.isArray(currentOverview.channels) ? currentOverview.channels : [];
+
+			if (!channels.length) {
+				const row = document.createElement('tr');
+				row.innerHTML = '<td colspan="4">No channels loaded yet.</td>';
+				tbody.appendChild(row);
+				return;
+			}
+
+			channels.forEach(channel => {
+				const row = document.createElement('tr');
+				row.className = 'clickable-row';
+				row.innerHTML = `
+					<td class="mono">${channel.channelIdx}</td>
+					<td>${channel.name || ''}</td>
+					<td><span class="pill${channel.subscribed ? ' ok' : ''}">${channel.subscribed ? 'yes' : 'no'}</span></td>
+					<td class="mono">${channel.secret || ''}</td>
+				`;
+				row.addEventListener('click', () => {
+					$('#channelIdx').val(channel.channelIdx);
+					$('#channelName').val(channel.name || '');
+					$('#channelSecret').val(channel.secret || '');
+				});
+				tbody.appendChild(row);
+			});
+		}
+
+		async function refreshOverview() {
+			setStatus('overviewStatus', 'info', 'Loading current adapter/device overview ...');
+			try {
+				const data = await callAdapter('getOverview', {});
+				renderOverview(data || {});
+				setStatus('overviewStatus', 'success', 'Overview refreshed.');
+			} catch (error) {
+				setStatus('overviewStatus', 'error', `Overview load failed: ${error.message || error}`);
+			}
+		}
+
+		function bindValueHandlers() {
+			$('.value').each(function () {
+				$(this).on('change keyup', () => currentOnChange && currentOnChange());
+			});
+
+			$('#serialPortManual').on('change keyup', () => {
+				const manualValue = $('#serialPortManual').val().trim();
+				if (manualValue) {
+					$('#serialPort').val(manualValue);
+				}
+				currentOnChange && currentOnChange();
+			});
+		}
+
+		function activateTab(targetId) {
+			$('.tab-button').removeClass('active');
+			$(`.tab-button[data-target="${targetId}"]`).addClass('active');
+			$('.panel').removeClass('active');
+			$(`#${targetId}`).addClass('active');
+		}
+
+		function load(settings, onChange) {
+			currentOnChange = onChange;
+			bindValueHandlers();
+
+			$('#serialPort').val(settings.serialPort || '');
+			$('#serialPortManual').val('');
+			$('#subscribedChannels').val(normalizeSubscriptions(settings.subscribedChannels));
+			$('#monitorPublicChannel').prop('checked', settings.monitorPublicChannel !== false);
+			$('#syncTimeOnConnect').prop('checked', settings.syncTimeOnConnect !== false);
+			$('#messagePollIntervalSeconds').val(settings.messagePollIntervalSeconds ?? 30);
+			$('#statsRefreshMinutes').val(settings.statsRefreshMinutes ?? 5);
+			$('#reconnectDelaySeconds').val(settings.reconnectDelaySeconds ?? 15);
+			$('#maxHistoryEntries').val(settings.maxHistoryEntries ?? 50);
+
+			refreshPorts(settings.serialPort || '');
+			clearStatus('globalStatus');
+			clearStatus('overviewStatus');
+		}
+
+		function save(callback) {
+			const manualSerial = $('#serialPortManual').val().trim();
+			callback({
+				serialPort: manualSerial || $('#serialPort').val() || '',
+				monitorPublicChannel: $('#monitorPublicChannel').prop('checked'),
+				subscribedChannels: parseSubscriptions($('#subscribedChannels').val()),
+				syncTimeOnConnect: $('#syncTimeOnConnect').prop('checked'),
+				messagePollIntervalSeconds: Number($('#messagePollIntervalSeconds').val()) || 0,
+				statsRefreshMinutes: Number($('#statsRefreshMinutes').val()) || 0,
+				reconnectDelaySeconds: Number($('#reconnectDelaySeconds').val()) || 15,
+				maxHistoryEntries: Number($('#maxHistoryEntries').val()) || 50,
+			});
+		}
+
+		$(function () {
+			$('.tab-button').on('click', function () {
+				activateTab($(this).data('target'));
+			});
+
+			$('#refreshPortsButton').on('click', async () => {
+				clearStatus('globalStatus');
+				await refreshPorts();
+			});
+
+			$('#refreshOverviewButton').on('click', refreshOverview);
+
+			$('#clearChannelButton').on('click', () => {
+				$('#channelForm')[0].reset();
+				clearStatus('overviewStatus');
+			});
+
+			$('#channelForm').on('submit', async event => {
+				event.preventDefault();
+				setStatus('overviewStatus', 'info', 'Writing channel to MeshCore device ...');
+
+				try {
+					const result = await callAdapter('upsertChannel', {
+						channelIdx: Number($('#channelIdx').val()),
+						name: $('#channelName').val().trim(),
+						secretHex: $('#channelSecret').val().trim(),
+					});
+
+					if (result && result.secret) {
+						$('#channelSecret').val(result.secret);
+					}
+
+					setStatus('overviewStatus', 'success', `Channel ${result.channelIdx} saved. Secret: ${result.secret}`);
+					await refreshOverview();
+				} catch (error) {
+					setStatus('overviewStatus', 'error', `Channel save failed: ${error.message || error}`);
+				}
+			});
+		});
+	</script>
+</body>
+</html>
