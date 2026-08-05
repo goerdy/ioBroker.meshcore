@@ -72,7 +72,7 @@
 		"adminUI": {
 			"config": "json"
 		},
-		"blockly": true,
+		"blocks": true,
 		"dependencies": [
 			{
 				"js-controller": ">=6.0.11"

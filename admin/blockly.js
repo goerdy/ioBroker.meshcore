@@ -1,5 +1,11 @@
 'use strict';
 
+/* global goog */
+if (typeof goog !== 'undefined') {
+	goog.provide('Blockly.JavaScript.Sendto');
+	goog.require('Blockly.JavaScript');
+}
+
 (function () {
 	/* global Blockly, systemLang */
 	if (typeof Blockly === 'undefined') {
@@ -8,12 +14,6 @@
 
 	const COLOR = 210;
 	const DEFAULT_INSTANCE = 'meshcore.0';
-	const category = 'MeshCore';
-
-	Blockly.CustomBlocks = Blockly.CustomBlocks || [];
-	if (!Blockly.CustomBlocks.includes('MeshCore')) {
-		Blockly.CustomBlocks.push('MeshCore');
-	}
 
 	Blockly.Words = Blockly.Words || {};
 	Blockly.Words.meshcore = {
@@ -153,12 +153,39 @@
 	Blockly.Sendto = Blockly.Sendto || {};
 	Blockly.Sendto.blocks = Blockly.Sendto.blocks || {};
 
-	Blockly.Sendto.blocks.meshcore_send_public =
-		'<block type="meshcore_send_public"><value name="MESSAGE"><shadow type="text"><field name="TEXT"></field></shadow></value></block>';
-	Blockly.Sendto.blocks.meshcore_send_channel =
-		'<block type="meshcore_send_channel"><value name="CHANNEL"><shadow type="text"><field name="TEXT">1</field></shadow></value><value name="MESSAGE"><shadow type="text"><field name="TEXT"></field></shadow></value></block>';
-	Blockly.Sendto.blocks.meshcore_send_private =
-		'<block type="meshcore_send_private"><value name="TARGET"><shadow type="text"><field name="TEXT"></field></shadow></value><value name="MESSAGE"><shadow type="text"><field name="TEXT"></field></shadow></value></block>';
+	Blockly.Sendto.blocks.meshcore = `
+		<block type="meshcore_send_public">
+			<value name="MESSAGE">
+				<shadow type="text">
+					<field name="TEXT"></field>
+				</shadow>
+			</value>
+		</block>
+		<block type="meshcore_send_channel">
+			<value name="CHANNEL">
+				<shadow type="text">
+					<field name="TEXT">1</field>
+				</shadow>
+			</value>
+			<value name="MESSAGE">
+				<shadow type="text">
+					<field name="TEXT"></field>
+				</shadow>
+			</value>
+		</block>
+		<block type="meshcore_send_private">
+			<value name="TARGET">
+				<shadow type="text">
+					<field name="TEXT"></field>
+				</shadow>
+			</value>
+			<value name="MESSAGE">
+				<shadow type="text">
+					<field name="TEXT"></field>
+				</shadow>
+			</value>
+		</block>
+	`;
 
 	Blockly.Blocks.meshcore_send_public = {
 		init: function () {
@@ -228,6 +255,4 @@
 			['commands.private.send', 'true'],
 		]);
 	};
-
-	Blockly.CustomBlocks[category] = Blockly.CustomBlocks[category] || [];
 })();
