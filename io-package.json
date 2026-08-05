@@ -91,16 +91,7 @@
 		"messagePollIntervalSeconds": 30,
 		"statsRefreshMinutes": 5,
 		"reconnectDelaySeconds": 15,
-		"maxHistoryEntries": 50,
-		"_adminSnapshotConnection": "",
-		"_adminSnapshotPort": "",
-		"_adminSnapshotDeviceName": "",
-		"_adminSnapshotPublicKey": "",
-		"_adminSnapshotFirmware": "",
-		"_adminSnapshotBattery": "",
-		"_adminSnapshotLastSync": "",
-		"_adminSnapshotLastError": "",
-		"_adminSnapshotChannels": ""
+		"maxHistoryEntries": 50
 	},
 	"objects": [],
 	"instanceObjects": [
