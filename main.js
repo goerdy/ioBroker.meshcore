@@ -866,6 +866,33 @@ class Meshcore extends utils.Adapter {
 				return;
 			}
 
+			if (obj.command === 'getOverviewText') {
+				const overview = await this.queueOperation(() => this.buildOverview());
+				const result = this.renderOverviewHtml(overview);
+				if (obj.callback) {
+					this.sendTo(obj.from, obj.command, result, obj.callback);
+				}
+				return;
+			}
+
+			if (obj.command === 'getOverviewQrImage') {
+				const overview = await this.queueOperation(() => this.buildOverview());
+				const result = overview?.qr?.dataUrl || '';
+				if (obj.callback) {
+					this.sendTo(obj.from, obj.command, result, obj.callback);
+				}
+				return;
+			}
+
+			if (obj.command === 'getChannelListText') {
+				const overview = await this.queueOperation(() => this.buildOverview());
+				const result = this.renderChannelListHtml(overview);
+				if (obj.callback) {
+					this.sendTo(obj.from, obj.command, result, obj.callback);
+				}
+				return;
+			}
+
 			if (obj.command === 'upsertChannel') {
 				const result = await this.queueOperation(() => this.upsertChannel(obj.message || {}));
 				if (obj.callback) {
@@ -1035,6 +1062,98 @@ class Meshcore extends utils.Adapter {
 		}
 
 		return Buffer.from(normalized, 'hex');
+	}
+
+	/**
+	 * @param {unknown} value
+	 * @returns {string}
+	 */
+	escapeHtml(value) {
+		return String(value ?? '')
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;');
+	}
+
+	/**
+	 * @param {Record<string, any>} overview
+	 * @returns {string}
+	 */
+	renderOverviewHtml(overview) {
+		const self = overview?.self || {};
+		const device = overview?.device || {};
+		const stats = overview?.stats || {};
+		const qr = overview?.qr || {};
+		const rows = [
+			['Connection', overview?.connected ? 'Connected' : 'Disconnected'],
+			['Configured port', overview?.configuredPort || ''],
+			['Device name', self.advName || self.name || self.displayName || ''],
+			['Public key', qr.publicKey || self.publicKey || self.public_key || self.pubKey || ''],
+			['Device type', device.deviceType || device.type || device.boardType || ''],
+			['Firmware', device.firmwareVersion || device.version || device.fwVersion || ''],
+			['Protocol', device.protocolVersion || device.companionProtocolVersion || ''],
+			['Battery mV', stats.batteryMilliVolts || ''],
+			['Contacts cached', Array.isArray(overview?.contacts) ? overview.contacts.length : 0],
+			['Channels cached', Array.isArray(overview?.channels) ? overview.channels.length : 0],
+			['Last error', overview?.lastError || ''],
+		];
+
+		return `
+<div>
+	<table style="width:100%; border-collapse:collapse;">
+		<tbody>
+			${rows
+				.map(
+					([label, value]) => `
+			<tr>
+				<td style="padding:6px 10px 6px 0; font-weight:600; vertical-align:top;">${this.escapeHtml(label)}</td>
+				<td style="padding:6px 0; vertical-align:top; word-break:break-word;">${this.escapeHtml(value)}</td>
+			</tr>`,
+				)
+				.join('')}
+		</tbody>
+	</table>
+</div>`.trim();
+	}
+
+	/**
+	 * @param {Record<string, any>} overview
+	 * @returns {string}
+	 */
+	renderChannelListHtml(overview) {
+		const channels = Array.isArray(overview?.channels) ? overview.channels : [];
+		if (!channels.length) {
+			return '<div>No channels loaded yet. Connect the adapter and refresh this section.</div>';
+		}
+
+		return `
+<div>
+	<table style="width:100%; border-collapse:collapse;">
+		<thead>
+			<tr>
+				<th style="text-align:left; padding:6px 10px 6px 0;">Index</th>
+				<th style="text-align:left; padding:6px 10px 6px 0;">Name</th>
+				<th style="text-align:left; padding:6px 10px 6px 0;">Subscribed</th>
+				<th style="text-align:left; padding:6px 0 6px 0;">Secret</th>
+			</tr>
+		</thead>
+		<tbody>
+			${channels
+				.map(
+					channel => `
+			<tr>
+				<td style="padding:6px 10px 6px 0; vertical-align:top;">${this.escapeHtml(channel.channelIdx)}</td>
+				<td style="padding:6px 10px 6px 0; vertical-align:top;">${this.escapeHtml(channel.name || '')}</td>
+				<td style="padding:6px 10px 6px 0; vertical-align:top;">${this.escapeHtml(channel.subscribed ? 'yes' : 'no')}</td>
+				<td style="padding:6px 0; vertical-align:top; word-break:break-word;">${this.escapeHtml(channel.secret || '')}</td>
+			</tr>`,
+				)
+				.join('')}
+		</tbody>
+	</table>
+</div>`.trim();
 	}
 
 	onUnload(callback) {
