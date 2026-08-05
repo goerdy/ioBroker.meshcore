@@ -23,6 +23,7 @@ class Meshcore extends utils.Adapter {
 		this.contactCache = new Map();
 		this.subscribedChannelConfig = parseSubscribedChannels([]);
 		this.maxHistoryEntries = 50;
+		this.connectAttemptId = 0;
 
 		this.on('ready', this.onReady.bind(this));
 		this.on('stateChange', this.onStateChange.bind(this));
@@ -245,6 +246,7 @@ class Meshcore extends utils.Adapter {
 		await this.closeCurrentConnection();
 
 		try {
+			const attemptId = ++this.connectAttemptId;
 			const { NodeJSSerialConnection } = this.meshcoreLib;
 			const connection = new NodeJSSerialConnection(this.config.serialPort);
 			this.meshConnection = connection;
@@ -263,9 +265,60 @@ class Meshcore extends utils.Adapter {
 			});
 
 			await connection.connect();
+			await this.waitForSerialReady(connection, attemptId);
 		} catch (error) {
 			await this.handleConnectionError(error);
 		}
+	}
+
+	async waitForSerialReady(connection, attemptId) {
+		await new Promise((resolve, reject) => {
+			const timeoutMs = 10000;
+			let done = false;
+
+			const finish = (callback, value) => {
+				if (done) {
+					return;
+				}
+				done = true;
+				clearTimeout(timeout);
+				if (connection?.serialPort) {
+					connection.serialPort.off('open', onOpen);
+					connection.serialPort.off('error', onError);
+					connection.serialPort.off('close', onCloseBeforeOpen);
+				}
+				callback(value);
+			};
+
+			const onOpen = () => finish(resolve);
+			const onError = error => finish(reject, error);
+			const onCloseBeforeOpen = () =>
+				finish(reject, new Error('Serial port closed before MeshCore became ready'));
+			const timeout = setTimeout(() => {
+				finish(
+					reject,
+					new Error(`Timed out after ${timeoutMs}ms while opening serial port ${this.config.serialPort}`),
+				);
+			}, timeoutMs);
+
+			if (!connection?.serialPort) {
+				finish(reject, new Error('MeshCore serial port object was not created'));
+				return;
+			}
+
+			connection.serialPort.once('open', onOpen);
+			connection.serialPort.once('error', onError);
+			connection.serialPort.once('close', onCloseBeforeOpen);
+
+			if (connection.serialPort.isOpen) {
+				finish(resolve);
+				return;
+			}
+
+			if (attemptId !== this.connectAttemptId) {
+				finish(reject, new Error('Superseded by a newer connection attempt'));
+			}
+		});
 	}
 
 	async handleConnected(connection) {
@@ -273,6 +326,7 @@ class Meshcore extends utils.Adapter {
 			return;
 		}
 
+		this.log.info(`MeshCore serial connection opened on ${this.config.serialPort}`);
 		this.connectionReady = true;
 		await this.setStateAsync('info.connection', { val: true, ack: true });
 		await this.setStateAsync('info.lastError', { val: '', ack: true });
@@ -348,7 +402,9 @@ class Meshcore extends utils.Adapter {
 	async handleDisconnected(reason) {
 		this.connectionReady = false;
 		this.stopIntervals();
+		this.log.warn(`MeshCore disconnected: ${reason}`);
 		await this.setStateAsync('info.connection', { val: false, ack: true });
+		await this.setStateAsync('info.lastError', { val: reason, ack: true });
 		this.scheduleReconnect(reason);
 	}
 
