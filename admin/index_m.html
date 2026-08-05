@@ -254,7 +254,30 @@ usermod -aG dialout iobroker</div>
 		let uiInitialized = false;
 
 		function instanceId() {
-			return `${adapter}.${instance}`;
+			const query = new URLSearchParams(window.location.search);
+			const rawInstance = query.get('instance') || query.get('adapterInstance') || query.get('id') || instance;
+
+			if (typeof rawInstance === 'string' && rawInstance) {
+				if (rawInstance.startsWith('system.adapter.')) {
+					return rawInstance.replace(/^system\.adapter\./, '');
+				}
+				if (rawInstance.includes('.')) {
+					return rawInstance;
+				}
+				if (/^\d+$/.test(rawInstance)) {
+					return `${adapter}.${rawInstance}`;
+				}
+			}
+
+			if (typeof instance === 'number') {
+				return `${adapter}.${instance}`;
+			}
+
+			if (typeof instance === 'string' && instance && instance !== 'undefined') {
+				return instance.includes('.') ? instance : `${adapter}.${instance}`;
+			}
+
+			return `${adapter}.0`;
 		}
 
 		function updateFields() {
@@ -479,19 +502,21 @@ usermod -aG dialout iobroker</div>
 		}
 
 		function load(settings, onChange) {
+			const config = settings && settings.native ? settings.native : settings || {};
+
 			currentOnChange = onChange;
 			bindUi();
 
-			$('#serialPortManual').val(settings.serialPort || '');
-			$('#subscribedChannels').val(normalizeSubscriptions(settings.subscribedChannels));
-			$('#monitorPublicChannel').prop('checked', settings.monitorPublicChannel !== false);
-			$('#syncTimeOnConnect').prop('checked', settings.syncTimeOnConnect !== false);
-			$('#messagePollIntervalSeconds').val(settings.messagePollIntervalSeconds != null ? settings.messagePollIntervalSeconds : 30);
-			$('#statsRefreshMinutes').val(settings.statsRefreshMinutes != null ? settings.statsRefreshMinutes : 5);
-			$('#reconnectDelaySeconds').val(settings.reconnectDelaySeconds != null ? settings.reconnectDelaySeconds : 15);
-			$('#maxHistoryEntries').val(settings.maxHistoryEntries != null ? settings.maxHistoryEntries : 50);
+			$('#serialPortManual').val(config.serialPort || '');
+			$('#subscribedChannels').val(normalizeSubscriptions(config.subscribedChannels));
+			$('#monitorPublicChannel').prop('checked', config.monitorPublicChannel !== false);
+			$('#syncTimeOnConnect').prop('checked', config.syncTimeOnConnect !== false);
+			$('#messagePollIntervalSeconds').val(config.messagePollIntervalSeconds != null ? config.messagePollIntervalSeconds : 30);
+			$('#statsRefreshMinutes').val(config.statsRefreshMinutes != null ? config.statsRefreshMinutes : 5);
+			$('#reconnectDelaySeconds').val(config.reconnectDelaySeconds != null ? config.reconnectDelaySeconds : 15);
+			$('#maxHistoryEntries').val(config.maxHistoryEntries != null ? config.maxHistoryEntries : 50);
 
-			refreshPorts(settings.serialPort || '').catch(error => {
+			refreshPorts(config.serialPort || '').catch(error => {
 				window.alert(`Could not load serial ports: ${error.message || error}`);
 			});
 
@@ -500,7 +525,9 @@ usermod -aG dialout iobroker</div>
 				M.textareaAutoResize($('#subscribedChannels'));
 				M.textareaAutoResize($('#channelSecret'));
 			}
-			onChange(false);
+			if (typeof onChange === 'function') {
+				onChange(false);
+			}
 		}
 
 		function save(callback) {
