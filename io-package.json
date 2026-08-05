@@ -72,6 +72,23 @@
 		"adminUI": {
 			"config": "json"
 		},
+		"adminTab": {
+			"name": {
+				"en": "Overview",
+				"de": "Uebersicht",
+				"ru": "Обзор",
+				"pt": "Visão geral",
+				"nl": "Overzicht",
+				"fr": "Aperçu",
+				"it": "Panoramica",
+				"es": "Resumen",
+				"pl": "Przegląd",
+				"uk": "Огляд",
+				"zh-cn": "概览"
+			},
+			"order": 2,
+			"supportsLoadingMessage": true
+		},
 		"dependencies": [
 			{
 				"js-controller": ">=6.0.11"

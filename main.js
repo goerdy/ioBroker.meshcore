@@ -1,6 +1,8 @@
 'use strict';
 
+const crypto = require('node:crypto');
 const utils = require('@iobroker/adapter-core');
+const QRCode = require('qrcode');
 const { SerialPort } = require('serialport');
 const { isChannelSubscribed, normalizeHex, parseSubscribedChannels, slugifySegment } = require('./lib/meshcore-utils');
 
@@ -853,13 +855,186 @@ class Meshcore extends utils.Adapter {
 				if (obj.callback) {
 					this.sendTo(obj.from, obj.command, result, obj.callback);
 				}
+				return;
+			}
+
+			if (obj.command === 'getOverview') {
+				const result = await this.queueOperation(() => this.buildOverview());
+				if (obj.callback) {
+					this.sendTo(obj.from, obj.command, result, obj.callback);
+				}
+				return;
+			}
+
+			if (obj.command === 'upsertChannel') {
+				const result = await this.queueOperation(() => this.upsertChannel(obj.message || {}));
+				if (obj.callback) {
+					this.sendTo(obj.from, obj.command, result, obj.callback);
+				}
+				return;
 			}
 		} catch (error) {
 			this.log.warn(`Message command ${obj.command} failed: ${error?.message || error}`);
 			if (obj.callback) {
-				this.sendTo(obj.from, obj.command, [], obj.callback);
+				this.sendTo(
+					obj.from,
+					obj.command,
+					{
+						error: error?.message || String(error),
+					},
+					obj.callback,
+				);
 			}
 		}
+	}
+
+	async buildOverview() {
+		const [selfState, deviceState, statsState, connectionState, errorState] = await Promise.all([
+			this.getJsonStateValue('meta.self', {}),
+			this.getJsonStateValue('meta.device', {}),
+			this.getJsonStateValue('meta.stats.core', {}),
+			this.getStateAsync('info.connection'),
+			this.getStateAsync('info.lastError'),
+		]);
+
+		const overview = {
+			connected: Boolean(connectionState?.val),
+			configuredPort: this.config.serialPort || '',
+			lastError: String(errorState?.val || ''),
+			self: selfState,
+			device: deviceState,
+			stats: statsState,
+			channels: [...this.channelCache.values()].map(channel => ({
+				channelIdx: channel.channelIdx,
+				name: channel.name || '',
+				secret: normalizeHex(channel.secret),
+				subscribed: isChannelSubscribed(this.subscribedChannelConfig, channel),
+			})),
+			contacts: [...this.contactCache.values()].map(contact => this.contactSummary(contact)),
+			subscriptions: {
+				monitorPublicChannel: this.config.monitorPublicChannel !== false,
+				configured: Array.isArray(this.config.subscribedChannels)
+					? this.config.subscribedChannels
+					: this.config.subscribedChannels
+						? [this.config.subscribedChannels]
+						: [],
+			},
+			qr: {
+				publicKey: '',
+				advertHex: '',
+				payload: '',
+				dataUrl: '',
+			},
+		};
+
+		if (this.meshConnection && this.connectionReady) {
+			const qr = await this.buildContactQr(selfState);
+			overview.qr = qr;
+		}
+
+		return overview;
+	}
+
+	async buildContactQr(selfState) {
+		const advert = await this.meshConnection.exportContact();
+		const advertHex = normalizeHex(advert);
+		const publicKey =
+			normalizeHex(selfState?.publicKey) ||
+			normalizeHex(selfState?.public_key) ||
+			normalizeHex(selfState?.pubKey);
+		const payload = JSON.stringify({
+			format: 'meshcore-contact-export',
+			name: String(selfState?.advName || selfState?.name || selfState?.displayName || '').trim() || 'MeshCore',
+			publicKey,
+			advertHex,
+		});
+
+		return {
+			publicKey,
+			advertHex,
+			payload,
+			dataUrl: await QRCode.toDataURL(payload, {
+				errorCorrectionLevel: 'M',
+				margin: 1,
+				width: 320,
+			}),
+		};
+	}
+
+	async upsertChannel(message) {
+		await this.ensureConnected();
+
+		const rawIndex = Number(message?.channelIdx);
+		if (!Number.isInteger(rawIndex) || rawIndex < 1) {
+			throw new Error('Channel index must be an integer greater than 0');
+		}
+
+		const channelName = String(message?.name || '').trim();
+		if (!channelName) {
+			throw new Error('Channel name is required');
+		}
+
+		const secretHex = normalizeHex(message?.secretHex);
+		const secret = secretHex ? this.hexToBytes(secretHex) : crypto.randomBytes(16);
+
+		await this.meshConnection.setChannel(rawIndex, channelName, secret);
+
+		const channels = await this.meshConnection.getChannels();
+		await this.storeChannels(channels);
+		await this.updateDynamicTargetsStates();
+
+		const updatedChannel = channels.find(channel => channel.channelIdx === rawIndex) || {
+			channelIdx: rawIndex,
+			name: channelName,
+			secret,
+		};
+
+		return {
+			ok: true,
+			channelIdx: rawIndex,
+			name: updatedChannel.name || channelName,
+			secret: normalizeHex(updatedChannel.secret || secret),
+			channel: {
+				channelIdx: updatedChannel.channelIdx,
+				name: updatedChannel.name || channelName,
+				secret: normalizeHex(updatedChannel.secret || secret),
+			},
+		};
+	}
+
+	/**
+	 * @template T
+	 * @param {string} id State ID relative to the instance.
+	 * @param {T} fallback Fallback when no JSON value can be parsed.
+	 * @returns {Promise<T>} Parsed JSON state value.
+	 */
+	async getJsonStateValue(id, fallback) {
+		const state = await this.getStateAsync(id);
+		if (!state?.val) {
+			return fallback;
+		}
+
+		try {
+			return JSON.parse(String(state.val));
+		} catch {
+			return fallback;
+		}
+	}
+
+	/**
+	 * @param {string} hex Lowercase or mixed-case hexadecimal string.
+	 * @returns {Buffer} Buffer representation of the hex string.
+	 */
+	hexToBytes(hex) {
+		const normalized = normalizeHex(hex);
+		if (!normalized) {
+			throw new Error('Channel secret must not be empty');
+		}
+		if (normalized.length % 2 !== 0) {
+			throw new Error('Channel secret must contain an even number of hex characters');
+		}
+
+		return Buffer.from(normalized, 'hex');
 	}
 
 	onUnload(callback) {

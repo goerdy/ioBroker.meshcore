@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MeshCore Overview</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--bg: #f4f6f8;
+			--card: #ffffff;
+			--text: #17212b;
+			--muted: #5b6773;
+			--line: #d8dde3;
+			--accent: #0d8a73;
+			--accent-2: #0f5f69;
+			--warn: #8f4b00;
+			--ok: #146c2e;
+			--error: #b3261e;
+			--shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+			background:
+				radial-gradient(circle at top left, rgba(13, 138, 115, 0.12), transparent 28%),
+				linear-gradient(180deg, #fbfcfd 0%, var(--bg) 100%);
+			color: var(--text);
+		}
+
+		a {
+			color: var(--accent-2);
+		}
+
+		.page {
+			max-width: 1240px;
+			margin: 0 auto;
+			padding: 24px;
+		}
+
+		.hero {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 16px;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 20px;
+			padding: 20px 24px;
+			border: 1px solid rgba(13, 138, 115, 0.18);
+			border-radius: 24px;
+			background: linear-gradient(135deg, rgba(13, 138, 115, 0.12), rgba(15, 95, 105, 0.06));
+			box-shadow: var(--shadow);
+		}
+
+		.hero h1 {
+			margin: 0 0 6px;
+			font-size: 28px;
+			font-weight: 700;
+		}
+
+		.hero p {
+			margin: 0;
+			max-width: 720px;
+			color: var(--muted);
+			line-height: 1.45;
+		}
+
+		.toolbar {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			align-items: center;
+		}
+
+		.button,
+		button {
+			border: 0;
+			border-radius: 12px;
+			padding: 11px 16px;
+			font: inherit;
+			cursor: pointer;
+			text-decoration: none;
+			background: var(--accent);
+			color: #fff;
+			transition: transform 0.12s ease, opacity 0.12s ease;
+		}
+
+		.button.secondary,
+		button.secondary {
+			background: #e6eef0;
+			color: var(--text);
+		}
+
+		.button:hover,
+		button:hover {
+			transform: translateY(-1px);
+		}
+
+		button:disabled {
+			opacity: 0.55;
+			cursor: wait;
+			transform: none;
+		}
+
+		.notice {
+			margin-bottom: 20px;
+			padding: 14px 16px;
+			border-radius: 14px;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.8);
+			color: var(--muted);
+		}
+
+		.notice strong {
+			color: var(--warn);
+		}
+
+		.status {
+			margin-bottom: 16px;
+			padding: 12px 14px;
+			border-radius: 12px;
+			display: none;
+			font-weight: 600;
+		}
+
+		.status.show {
+			display: block;
+		}
+
+		.status.info {
+			background: #e8f2ff;
+			color: #0d47a1;
+		}
+
+		.status.success {
+			background: #e8f5e9;
+			color: var(--ok);
+		}
+
+		.status.error {
+			background: #fdecea;
+			color: var(--error);
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(12, minmax(0, 1fr));
+			gap: 18px;
+		}
+
+		.card {
+			grid-column: span 12;
+			background: var(--card);
+			border: 1px solid rgba(23, 33, 43, 0.08);
+			border-radius: 20px;
+			padding: 20px;
+			box-shadow: var(--shadow);
+		}
+
+		.card h2 {
+			margin: 0 0 14px;
+			font-size: 20px;
+		}
+
+		.card p {
+			color: var(--muted);
+		}
+
+		.info-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+			gap: 14px;
+		}
+
+		.metric {
+			padding: 14px;
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			background: #fbfcfd;
+		}
+
+		.metric label {
+			display: block;
+			margin-bottom: 6px;
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--muted);
+		}
+
+		.metric .value {
+			font-size: 15px;
+			word-break: break-word;
+		}
+
+		.metric .value.mono,
+		.mono {
+			font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+		}
+
+		.split {
+			display: grid;
+			grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+			gap: 18px;
+		}
+
+		.qr-box {
+			border: 1px dashed rgba(13, 138, 115, 0.35);
+			border-radius: 18px;
+			padding: 16px;
+			background: linear-gradient(180deg, rgba(13, 138, 115, 0.05), rgba(13, 138, 115, 0.02));
+			text-align: center;
+		}
+
+		.qr-box img {
+			width: min(100%, 280px);
+			border-radius: 14px;
+			background: #fff;
+			padding: 10px;
+			border: 1px solid var(--line);
+		}
+
+		.code-block {
+			margin-top: 12px;
+			padding: 12px;
+			max-height: 180px;
+			overflow: auto;
+			border-radius: 14px;
+			border: 1px solid var(--line);
+			background: #f8fafb;
+			font-size: 12px;
+			line-height: 1.45;
+			word-break: break-word;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		th,
+		td {
+			padding: 12px 10px;
+			text-align: left;
+			border-bottom: 1px solid var(--line);
+			vertical-align: top;
+		}
+
+		th {
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--muted);
+		}
+
+		.pill {
+			display: inline-flex;
+			align-items: center;
+			padding: 4px 9px;
+			border-radius: 999px;
+			font-size: 12px;
+			font-weight: 700;
+			background: #eef2f4;
+			color: var(--muted);
+		}
+
+		.pill.ok {
+			background: #e6f4ea;
+			color: var(--ok);
+		}
+
+		.form-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+			gap: 14px;
+		}
+
+		.field label {
+			display: block;
+			margin-bottom: 7px;
+			font-weight: 600;
+		}
+
+		.field input,
+		.field textarea {
+			width: 100%;
+			padding: 11px 12px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			font: inherit;
+			background: #fff;
+			color: var(--text);
+		}
+
+		.field textarea {
+			min-height: 90px;
+			resize: vertical;
+		}
+
+		.field small {
+			display: block;
+			margin-top: 6px;
+			color: var(--muted);
+			line-height: 1.4;
+		}
+
+		@media (max-width: 920px) {
+			.split {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="page">
+		<section class="hero">
+			<div>
+				<h1>MeshCore Overview</h1>
+				<p>Live device details, public key export, QR code, and direct channel provisioning for this adapter instance.</p>
+			</div>
+			<div class="toolbar">
+				<button id="refreshButton" type="button">Refresh</button>
+				<a class="button secondary" href="https://github.com/goerdy/ioBroker.meshcore" target="_blank" rel="noreferrer">GitHub Help</a>
+			</div>
+		</section>
+
+		<div class="notice">
+			<strong>Alpha warning:</strong> this thing runs as a test version, but it is still rough, vibe-coded, and absolutely not something anyone should trust blindly.
+		</div>
+
+		<div id="status" class="status info"></div>
+
+		<div class="grid">
+			<section class="card">
+				<h2>Device Status</h2>
+				<div id="deviceInfo" class="info-grid"></div>
+			</section>
+
+			<section class="card">
+				<h2>Identity and QR</h2>
+				<div class="split">
+					<div id="identityInfo" class="info-grid"></div>
+					<div class="qr-box">
+						<img id="qrImage" alt="MeshCore QR code" hidden>
+						<p id="qrFallback">No QR data available yet. Connect the adapter to a real device and refresh this tab.</p>
+					</div>
+				</div>
+				<div class="code-block mono" id="advertHex"></div>
+			</section>
+
+			<section class="card">
+				<h2>Configured Channels</h2>
+				<div style="overflow:auto;">
+					<table>
+						<thead>
+							<tr>
+								<th>Index</th>
+								<th>Name</th>
+								<th>Subscribed</th>
+								<th>Secret</th>
+							</tr>
+						</thead>
+						<tbody id="channelsTable"></tbody>
+					</table>
+				</div>
+			</section>
+
+			<section class="card">
+				<h2>Add or Update Channel</h2>
+				<p>Set a MeshCore channel directly on the device. Leave the secret empty to auto-generate a random one on save.</p>
+				<form id="channelForm">
+					<div class="form-grid">
+						<div class="field">
+							<label for="channelIdx">Channel index</label>
+							<input id="channelIdx" name="channelIdx" type="number" min="1" step="1" required>
+							<small>Use channel indexes above <span class="mono">0</span>. Public stays reserved.</small>
+						</div>
+						<div class="field">
+							<label for="channelName">Channel name</label>
+							<input id="channelName" name="channelName" type="text" maxlength="64" required>
+							<small>This should match what the other MeshCore peers use.</small>
+						</div>
+						<div class="field" style="grid-column: 1 / -1;">
+							<label for="channelSecret">Channel secret</label>
+							<textarea id="channelSecret" name="channelSecret" placeholder="Optional hex string, for example 00112233445566778899aabbccddeeff"></textarea>
+							<small>Hex only. Empty means the adapter generates a random secret and shows it after saving.</small>
+						</div>
+					</div>
+					<div class="toolbar" style="margin-top:16px;">
+						<button id="saveChannelButton" type="submit">Save Channel</button>
+						<button id="clearButton" class="secondary" type="button">Clear Form</button>
+					</div>
+				</form>
+			</section>
+		</div>
+	</div>
+
+	<script>
+		(() => {
+			const adapterName = "meshcore";
+			const statusEl = document.getElementById("status");
+			const deviceInfoEl = document.getElementById("deviceInfo");
+			const identityInfoEl = document.getElementById("identityInfo");
+			const channelsTableEl = document.getElementById("channelsTable");
+			const qrImageEl = document.getElementById("qrImage");
+			const qrFallbackEl = document.getElementById("qrFallback");
+			const advertHexEl = document.getElementById("advertHex");
+			const refreshButton = document.getElementById("refreshButton");
+			const saveChannelButton = document.getElementById("saveChannelButton");
+			const clearButton = document.getElementById("clearButton");
+			const channelForm = document.getElementById("channelForm");
+			const channelIdxInput = document.getElementById("channelIdx");
+			const channelNameInput = document.getElementById("channelName");
+			const channelSecretInput = document.getElementById("channelSecret");
+
+			function detectInstance() {
+				const candidates = [
+					window.location.href,
+					window.location.search,
+					window.location.hash,
+					window.parent && window.parent.location ? window.parent.location.href : "",
+					window.parent && window.parent.location ? window.parent.location.hash : "",
+				].filter(Boolean);
+
+				for (const candidate of candidates) {
+					const fullMatch = candidate.match(/system\.adapter\.meshcore\.\d+/i);
+					if (fullMatch) {
+						return fullMatch[0].replace(/^system\.adapter\./i, "");
+					}
+
+					const shortMatch = candidate.match(/\bmeshcore\.\d+\b/i);
+					if (shortMatch) {
+						return shortMatch[0];
+					}
+
+					const instanceParam = candidate.match(/[?&]instance=(?:system\.adapter\.)?(meshcore\.\d+|\d+)/i);
+					if (instanceParam) {
+						return instanceParam[1].startsWith("meshcore.") ? instanceParam[1] : `meshcore.${instanceParam[1]}`;
+					}
+				}
+
+				return "meshcore.0";
+			}
+
+			const instance = detectInstance();
+
+			function notifyLoaded() {
+				if (window.parent !== window) {
+					try {
+						window.parent.postMessage("iobLoaded", "*");
+					} catch {
+					}
+				}
+			}
+
+			function setStatus(type, text) {
+				statusEl.className = `status show ${type}`;
+				statusEl.textContent = text;
+			}
+
+			function clearStatus() {
+				statusEl.className = "status info";
+				statusEl.textContent = "";
+			}
+
+			function setBusy(isBusy) {
+				refreshButton.disabled = isBusy;
+				saveChannelButton.disabled = isBusy;
+			}
+
+			function valueFrom(obj, keys) {
+				for (const key of keys) {
+					const value = obj && obj[key];
+					if (value !== undefined && value !== null && String(value).trim() !== "") {
+						return String(value);
+					}
+				}
+				return "";
+			}
+
+			function metric(label, value, isMono = false) {
+				const wrapper = document.createElement("div");
+				wrapper.className = "metric";
+
+				const title = document.createElement("label");
+				title.textContent = label;
+				wrapper.appendChild(title);
+
+				const content = document.createElement("div");
+				content.className = `value${isMono ? " mono" : ""}`;
+				content.textContent = value || "n/a";
+				wrapper.appendChild(content);
+
+				return wrapper;
+			}
+
+			function callSendTo(command, message) {
+				return new Promise((resolve, reject) => {
+					try {
+						const parentWindow = window.parent || window;
+						if (typeof parentWindow.sendTo === "function") {
+							parentWindow.sendTo(instance, command, message, response => {
+								if (response && response.error) {
+									reject(new Error(response.error));
+									return;
+								}
+								resolve(response);
+							});
+							return;
+						}
+
+						if (parentWindow.socket && typeof parentWindow.socket.emit === "function") {
+							parentWindow.socket.emit("sendTo", instance, command, message, response => {
+								if (response && response.error) {
+									reject(new Error(response.error));
+									return;
+								}
+								resolve(response);
+							});
+							return;
+						}
+
+						reject(new Error("ioBroker admin messaging bridge not available"));
+					} catch (error) {
+						reject(error);
+					}
+				});
+			}
+
+			function renderOverview(data) {
+				const self = data.self || {};
+				const device = data.device || {};
+				const stats = data.stats || {};
+				const qr = data.qr || {};
+
+				deviceInfoEl.replaceChildren(
+					metric("Instance", instance, true),
+					metric("Connection", data.connected ? "Connected" : "Disconnected"),
+					metric("Configured port", data.configuredPort || ""),
+					metric("Device name", valueFrom(self, ["advName", "name", "displayName"])),
+					metric("Public key", qr.publicKey || valueFrom(self, ["publicKey", "public_key", "pubKey"]), true),
+					metric("Device type", valueFrom(device, ["deviceType", "type", "boardType"])),
+					metric("Firmware", valueFrom(device, ["firmwareVersion", "version", "fwVersion"])),
+					metric("Protocol", valueFrom(device, ["protocolVersion", "companionProtocolVersion"])),
+					metric("Battery mV", valueFrom(stats, ["batteryMilliVolts"])),
+					metric("Last error", data.lastError || ""),
+				);
+
+				identityInfoEl.replaceChildren(
+					metric("Advert name", valueFrom(self, ["advName", "name", "displayName"])),
+					metric("Public key", qr.publicKey || valueFrom(self, ["publicKey", "public_key", "pubKey"]), true),
+					metric("Advert export", qr.advertHex || "", true),
+					metric("Contacts cached", String((data.contacts || []).length)),
+					metric("Channels cached", String((data.channels || []).length)),
+				);
+
+				if (qr.dataUrl) {
+					qrImageEl.src = qr.dataUrl;
+					qrImageEl.hidden = false;
+					qrFallbackEl.hidden = true;
+				} else {
+					qrImageEl.hidden = true;
+					qrFallbackEl.hidden = false;
+				}
+
+				advertHexEl.textContent = qr.payload
+					? `QR payload\n${qr.payload}\n\nAdvert hex\n${qr.advertHex || "n/a"}`
+					: "No contact export available yet.";
+
+				channelsTableEl.replaceChildren();
+				const channels = Array.isArray(data.channels) ? data.channels : [];
+				if (!channels.length) {
+					const row = document.createElement("tr");
+					const cell = document.createElement("td");
+					cell.colSpan = 4;
+					cell.textContent = "No channels loaded yet.";
+					row.appendChild(cell);
+					channelsTableEl.appendChild(row);
+					return;
+				}
+
+				for (const channel of channels) {
+					const row = document.createElement("tr");
+					row.innerHTML = `
+						<td class="mono">${channel.channelIdx}</td>
+						<td>${channel.name || ""}</td>
+						<td><span class="pill${channel.subscribed ? " ok" : ""}">${channel.subscribed ? "yes" : "no"}</span></td>
+						<td class="mono">${channel.secret || ""}</td>
+					`;
+					row.addEventListener("click", () => {
+						channelIdxInput.value = channel.channelIdx;
+						channelNameInput.value = channel.name || "";
+						channelSecretInput.value = channel.secret || "";
+					});
+					channelsTableEl.appendChild(row);
+				}
+			}
+
+			async function refreshOverview() {
+				setBusy(true);
+				setStatus("info", "Loading live MeshCore overview ...");
+				try {
+					const data = await callSendTo("getOverview", {});
+					renderOverview(data || {});
+					setStatus("success", "Overview refreshed.");
+				} catch (error) {
+					setStatus("error", `Overview load failed: ${error.message || error}`);
+				} finally {
+					setBusy(false);
+				}
+			}
+
+			async function saveChannel(event) {
+				event.preventDefault();
+				const channelIdx = Number(channelIdxInput.value);
+				const name = channelNameInput.value.trim();
+				const secretHex = channelSecretInput.value.trim();
+
+				setBusy(true);
+				setStatus("info", "Writing channel to MeshCore device ...");
+				try {
+					const result = await callSendTo("upsertChannel", {
+						channelIdx,
+						name,
+						secretHex,
+					});
+					channelSecretInput.value = result && result.secret ? result.secret : channelSecretInput.value;
+					setStatus("success", `Channel ${result.channelIdx} saved. Secret: ${result.secret}`);
+					await refreshOverview();
+				} catch (error) {
+					setStatus("error", `Channel save failed: ${error.message || error}`);
+				} finally {
+					setBusy(false);
+				}
+			}
+
+			function clearForm() {
+				channelForm.reset();
+				clearStatus();
+			}
+
+			refreshButton.addEventListener("click", refreshOverview);
+			channelForm.addEventListener("submit", saveChannel);
+			clearButton.addEventListener("click", clearForm);
+
+			notifyLoaded();
+			refreshOverview();
+		})();
+	</script>
+</body>
+</html>

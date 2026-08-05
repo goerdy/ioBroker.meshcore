@@ -21,9 +21,11 @@ It is also completely vibe-coded so far, and no human has reviewed the code yet.
 
 - Serial connection to a MeshCore companion device
 - Admin UI for selecting the serial port
+- Additional admin overview tab with device identity, public key, channel overview, and QR export
 - Storage of MeshCore self info, device info, contacts, channels, and stats under a dedicated object tree
 - Storage of public channel messages
 - Subscription to additional channels by index or name
+- Direct channel create/update from the admin overview tab
 - Storage of incoming and outgoing private messages per contact
 - Send states for public, channel, and private text messages
 
@@ -70,6 +72,20 @@ Depending on your admin version, this is typically done via the custom installat
 - Enable or disable public channel storage.
 - Add additional subscribed channels by channel index or exact name.
 - Adjust reconnect delay, fallback polling interval, stats refresh, and message history size as needed.
+
+## Admin Tabs
+
+The adapter currently exposes two admin areas:
+
+- Config tab
+  Serial port selection, public channel handling, subscribed channels, reconnect and polling parameters
+- Overview tab
+  Live connection status, device identity, public key, exported contact QR code, loaded channels, and direct channel create or update
+
+Important detail:
+
+- Creating or updating a channel in the Overview tab writes the channel to the MeshCore device.
+- If you also want message storage for that channel, add the channel index or exact channel name to the subscribed channels setting in the Config tab.
 
 ## Serial Device Permissions
 
@@ -123,7 +139,7 @@ Not verified end to end:
 
 - Real serial connection to MeshCore hardware
 - Full ioBroker integration with physical device traffic
-- Reliable installation from the published GitHub repository, because the public repository push is still pending
+- Long-term field stability with real-world MeshCore traffic and reconnect edge cases
 
 ## Changelog
 
@@ -132,6 +148,8 @@ Not verified end to end:
 - Initial alpha release
 - Added MeshCore serial adapter base
 - Added admin configuration for serial port and channel subscriptions
+- Added admin overview tab with public key details and QR export
+- Added direct channel create and update support from admin
 - Added metadata, channel, and private message object tree
 - Added send states for public, channel, and private text messages
 

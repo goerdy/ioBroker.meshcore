@@ -25,6 +25,7 @@
   "dependencies": {
     "@iobroker/adapter-core": "^3.4.3",
     "@liamcottle/meshcore.js": "^1.13.0",
+    "qrcode": "^1.5.4",
     "serialport": "^13.0.0"
   },
   "devDependencies": {
