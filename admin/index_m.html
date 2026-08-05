@@ -329,6 +329,28 @@ usermod -aG dialout iobroker</div>
 			});
 		}
 
+		function fetchInstanceObject() {
+			return new Promise((resolve, reject) => {
+				const id = `system.adapter.${instanceId()}`;
+
+				try {
+					if (typeof getObject === 'function') {
+						getObject(id, obj => resolve(obj || null));
+						return;
+					}
+
+					if (socket && typeof socket.emit === 'function') {
+						socket.emit('getObject', id, obj => resolve(obj || null));
+						return;
+					}
+
+					reject(new Error('No admin object bridge available'));
+				} catch (error) {
+					reject(error);
+				}
+			});
+		}
+
 		async function refreshPorts(selectedValue) {
 			const ports = await callAdapter('listSerialPorts', {});
 			const select = $('#serialPort');
@@ -501,12 +523,7 @@ usermod -aG dialout iobroker</div>
 			});
 		}
 
-		function load(settings, onChange) {
-			const config = settings && settings.native ? settings.native : settings || {};
-
-			currentOnChange = onChange;
-			bindUi();
-
+		function applyConfig(config) {
 			$('#serialPortManual').val(config.serialPort || '');
 			$('#subscribedChannels').val(normalizeSubscriptions(config.subscribedChannels));
 			$('#monitorPublicChannel').prop('checked', config.monitorPublicChannel !== false);
@@ -525,8 +542,28 @@ usermod -aG dialout iobroker</div>
 				M.textareaAutoResize($('#subscribedChannels'));
 				M.textareaAutoResize($('#channelSecret'));
 			}
+		}
+
+		async function load(settings, onChange) {
+			const config = settings && settings.native ? settings.native : settings || {};
+
+			currentOnChange = onChange;
+			bindUi();
+			applyConfig(config);
 			if (typeof onChange === 'function') {
 				onChange(false);
+			}
+
+			try {
+				const instanceObject = await fetchInstanceObject();
+				if (instanceObject && instanceObject.native) {
+					applyConfig(instanceObject.native);
+					if (typeof onChange === 'function') {
+						onChange(false);
+					}
+				}
+			} catch (error) {
+				console.warn('MeshCore admin fallback load failed', error);
 			}
 		}
 
