@@ -4,6 +4,16 @@
 
 MeshCore companion adapter for ioBroker with serial connection setup, metadata sync, public channel storage, additional channel subscriptions, and private message history.
 
+## Screenshots
+
+Admin configuration and overview:
+
+![Admin screenshot](docs/admin-screenshot.png)
+
+Blockly send blocks:
+
+![Blockly screenshot](docs/blockly-screenshot.png)
+
 ## Alpha Status
 
 This adapter is an absolute, untested alpha.
@@ -21,13 +31,14 @@ It is also completely vibe-coded so far, and no human has reviewed the code yet.
 
 - Serial connection to a MeshCore companion device
 - Admin UI for selecting the serial port
-- Additional admin overview tab with device identity, public key, channel overview, and QR export
+- Embedded admin overview on the main config page with device identity, public key, channel overview, and QR export
 - Storage of MeshCore self info, device info, contacts, channels, and stats under a dedicated object tree
 - Storage of public channel messages
 - Subscription to additional channels by index or name
-- Direct channel create/update from the admin overview tab
+- Direct channel create/update from the admin config page
 - Storage of incoming and outgoing private messages per contact
 - Send states for public, channel, and private text messages
+- Custom Blockly send blocks for public, channel, and private MeshCore messages
 
 ## Implementation Notes
 
@@ -73,19 +84,34 @@ Depending on your admin version, this is typically done via the custom installat
 - Add additional subscribed channels by channel index or exact name.
 - Adjust reconnect delay, fallback polling interval, stats refresh, and message history size as needed.
 
-## Admin Tabs
+## Admin UI
 
-The adapter currently exposes two admin areas:
+The adapter currently exposes one main config page with:
 
-- Config tab
-  Serial port selection, public channel handling, subscribed channels, reconnect and polling parameters
-- Overview tab
-  Live connection status, device identity, public key, exported contact QR code, loaded channels, and direct channel create or update
+- Serial port selection
+- Public channel handling
+- Additional subscribed channels
+- Reconnect and polling parameters
+- Device identity, public key, QR export, and known channels
+- Direct channel create or update on the connected MeshCore device
 
 Important detail:
 
-- Creating or updating a channel in the Overview tab writes the channel to the MeshCore device.
-- If you also want message storage for that channel, add the channel index or exact channel name to the subscribed channels setting in the Config tab.
+- Creating or updating a channel in the admin config page writes the channel to the MeshCore device.
+- If you also want message storage for that channel, add the channel index or exact channel name to the subscribed channels setting.
+
+## Blockly Send Blocks
+
+The adapter provides custom Blockly send blocks inside the `Sendto` category:
+
+- `MeshCore public message`
+  Writes to `commands.public.*` and sends a public MeshCore text message
+- `MeshCore channel message`
+  Writes to `commands.channel.*` and sends a text message to a selected MeshCore channel
+- `MeshCore private message`
+  Writes to `commands.private.*` and sends a private text message to a selected MeshCore target
+
+These blocks require a JavaScript adapter version that picks up custom adapter Blockly files correctly. For compatibility, the adapter currently exposes both `common.blocks` and the legacy `common.blockly` flag.
 
 ## Serial Device Permissions
 
@@ -142,6 +168,12 @@ Not verified end to end:
 - Long-term field stability with real-world MeshCore traffic and reconnect edge cases
 
 ## Changelog
+
+### 0.0.2
+
+- Added Blockly send block documentation
+- Added README screenshots for admin UI and Blockly blocks
+- Added legacy `common.blockly` compatibility flag for JavaScript Blockly detection
 
 ### 0.0.1
 

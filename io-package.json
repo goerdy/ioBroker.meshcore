@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "meshcore",
-		"version": "0.0.1",
+		"version": "0.0.2",
 		"news": {
+			"0.0.2": {
+				"en": "added README screenshots, Blockly documentation, and legacy Blockly compatibility flag",
+				"de": "README-Screenshots, Blockly-Dokumentation und Legacy-Blockly-Kompatibilitätsflag hinzugefügt",
+				"ru": "добавлены скриншоты README, документация Blockly и флаг совместимости legacy Blockly",
+				"pt": "adicionadas capturas de ecrã ao README, documentação Blockly e sinalizador de compatibilidade Blockly legado",
+				"nl": "README-screenshots, Blockly-documentatie en legacy-Blockly-compatibiliteitsvlag toegevoegd",
+				"fr": "ajout de captures README, de la documentation Blockly et du drapeau de compatibilité Blockly hérité",
+				"it": "aggiunti screenshot README, documentazione Blockly e flag di compatibilità Blockly legacy",
+				"es": "se añadieron capturas al README, documentación de Blockly y el indicador de compatibilidad Blockly heredado",
+				"pl": "dodano zrzuty README, dokumentację Blockly i flagę zgodności ze starszym Blockly",
+				"uk": "додано знімки README, документацію Blockly і прапорець сумісності зі старим Blockly",
+				"zh-cn": "添加了 README 截图、Blockly 文档和旧版 Blockly 兼容标记"
+			},
 			"0.0.1": {
 				"en": "initial release",
 				"de": "Erstveröffentlichung",

@@ -1,6 +1,6 @@
 {
   "name": "iobroker.meshcore",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "MeshCore companion adapter for ioBroker",
   "author": {
     "name": "goerdy",
@@ -46,6 +46,7 @@
   "files": [
     "admin{,/!(src)/**}/!(tsconfig|tsconfig.*|.eslintrc).{json,json5}",
     "admin{,/!(src)/**}/*.{html,css,png,svg,jpg,js}",
+    "docs/",
     "lib/",
     "www/",
     "io-package.json",
