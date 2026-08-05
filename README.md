@@ -27,6 +27,16 @@ It is also completely vibe-coded so far, and no human has reviewed the code yet.
 - Storage of incoming and outgoing private messages per contact
 - Send states for public, channel, and private text messages
 
+## Implementation Notes
+
+This adapter was built on top of the official ioBroker adapter template and uses Liam Cottle's MeshCore JavaScript implementation for the MeshCore companion protocol side.
+
+Current building blocks:
+
+- ioBroker adapter scaffold generated with `@iobroker/create-adapter`
+- MeshCore serial/protocol access implemented via `@liamcottle/meshcore.js`
+- Adapter-specific object tree, admin configuration, and ioBroker state handling implemented in this repository
+
 ## Object Tree
 
 The adapter uses its own object tree below the instance namespace:
