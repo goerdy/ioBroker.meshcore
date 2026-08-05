@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="refresh" content="0; url=index_m.html">
 	<title>MeshCore</title>
 </head>
-<body></body>
+<body>
+	<script>
+		window.location.replace(`index_m.html${window.location.search}${window.location.hash}`);
+	</script>
+</body>
 </html>
