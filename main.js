@@ -366,6 +366,7 @@ class Meshcore extends utils.Adapter {
 			ack: true,
 		});
 		await this.updateDynamicTargetsStates();
+		await this.updateAdminSnapshots();
 	}
 
 	startIntervals() {
@@ -407,6 +408,7 @@ class Meshcore extends utils.Adapter {
 		this.log.warn(`MeshCore disconnected: ${reason}`);
 		await this.setStateAsync('info.connection', { val: false, ack: true });
 		await this.setStateAsync('info.lastError', { val: reason, ack: true });
+		await this.updateAdminSnapshots();
 		this.scheduleReconnect(reason);
 	}
 
@@ -416,6 +418,7 @@ class Meshcore extends utils.Adapter {
 		this.log.error(`MeshCore connect failed: ${message}`);
 		await this.setStateAsync('info.connection', { val: false, ack: true });
 		await this.setStateAsync('info.lastError', { val: message, ack: true });
+		await this.updateAdminSnapshots();
 		this.scheduleReconnect('connect failed');
 	}
 
@@ -453,14 +456,17 @@ class Meshcore extends utils.Adapter {
 		await this.setJsonState('meta.stats.core', coreStats.data);
 		await this.setJsonState('meta.stats.radio', radioStats.data);
 		await this.setJsonState('meta.stats.packets', packetStats.data);
+		await this.updateAdminSnapshots();
 	}
 
 	async storeSelfInfo(selfInfo) {
 		await this.setJsonState('meta.self', selfInfo);
+		await this.updateAdminSnapshots();
 	}
 
 	async storeDeviceInfo(deviceInfo) {
 		await this.setJsonState('meta.device', deviceInfo);
+		await this.updateAdminSnapshots();
 	}
 
 	async storeContacts(contacts) {
@@ -520,6 +526,7 @@ class Meshcore extends utils.Adapter {
 				subscribed: isChannelSubscribed(this.subscribedChannelConfig, channel),
 			})),
 		);
+		await this.updateAdminSnapshots();
 	}
 
 	async ensureChannelBranch(channel) {
@@ -988,6 +995,7 @@ class Meshcore extends utils.Adapter {
 			ack: true,
 		});
 		await this.updateDynamicTargetsStates();
+		await this.updateAdminSnapshots();
 	}
 
 	async buildContactQr(selfState) {
@@ -1200,6 +1208,51 @@ class Meshcore extends utils.Adapter {
 		</tbody>
 	</table>
 </div>`.trim();
+	}
+
+	async updateAdminSnapshots() {
+		const instanceId = `system.adapter.${this.namespace}`;
+		const instanceObject = await this.getForeignObjectAsync(instanceId);
+		if (!instanceObject) {
+			return;
+		}
+
+		const [selfState, deviceState, statsState, lastSyncState, lastErrorState, connectionState] = await Promise.all([
+			this.getJsonStateValue('meta.self', {}),
+			this.getJsonStateValue('meta.device', {}),
+			this.getJsonStateValue('meta.stats.core', {}),
+			this.getStateAsync('info.lastSync'),
+			this.getStateAsync('info.lastError'),
+			this.getStateAsync('info.connection'),
+		]);
+
+		const channelLines = [...this.channelCache.values()].map(channel => {
+			const subscribed = isChannelSubscribed(this.subscribedChannelConfig, channel) ? 'yes' : 'no';
+			return `${channel.channelIdx}: ${channel.name || ''} [subscribed=${subscribed}] ${normalizeHex(channel.secret)}`;
+		});
+
+		instanceObject.native = {
+			...instanceObject.native,
+			_adminSnapshotConnection: connectionState?.val ? 'Connected' : 'Disconnected',
+			_adminSnapshotPort: this.config.serialPort || '',
+			_adminSnapshotDeviceName: String(selfState?.advName || selfState?.name || selfState?.displayName || ''),
+			_adminSnapshotPublicKey: String(
+				normalizeHex(selfState?.publicKey) ||
+					normalizeHex(selfState?.public_key) ||
+					normalizeHex(selfState?.pubKey) ||
+					'',
+			),
+			_adminSnapshotFirmware: String(
+				deviceState?.firmwareVersion || deviceState?.version || deviceState?.fwVersion || '',
+			),
+			_adminSnapshotBattery: String(statsState?.batteryMilliVolts || ''),
+			_adminSnapshotLastSync: String(lastSyncState?.val || ''),
+			_adminSnapshotLastError: String(lastErrorState?.val || ''),
+			_adminSnapshotChannels:
+				channelLines.join('\n') || 'No channels loaded yet. Reload this page after the adapter has synced.',
+		};
+
+		await this.setForeignObjectAsync(instanceId, instanceObject);
 	}
 
 	onUnload(callback) {

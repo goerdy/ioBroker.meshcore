@@ -167,6 +167,94 @@
 			"lg": 12,
 			"xl": 12
 		},
+		"_adminSnapshotConnection": {
+			"type": "text",
+			"label": "Snapshot connection",
+			"readOnly": true,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 4,
+			"lg": 3,
+			"xl": 3
+		},
+		"_adminSnapshotPort": {
+			"type": "text",
+			"label": "Snapshot configured port",
+			"readOnly": true,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 8,
+			"lg": 5,
+			"xl": 5
+		},
+		"_adminSnapshotDeviceName": {
+			"type": "text",
+			"label": "Snapshot device name",
+			"readOnly": true,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
+		},
+		"_adminSnapshotPublicKey": {
+			"type": "text",
+			"label": "Snapshot public key",
+			"readOnly": true,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 8,
+			"xl": 8
+		},
+		"_adminSnapshotFirmware": {
+			"type": "text",
+			"label": "Snapshot firmware",
+			"readOnly": true,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
+		},
+		"_adminSnapshotBattery": {
+			"type": "text",
+			"label": "Snapshot battery",
+			"readOnly": true,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
+		},
+		"_adminSnapshotLastSync": {
+			"type": "text",
+			"label": "Snapshot last sync",
+			"readOnly": true,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
+		},
+		"_adminSnapshotLastError": {
+			"type": "text",
+			"label": "Snapshot last error",
+			"readOnly": true,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
+		},
 		"_channelHeader": {
 			"type": "staticText",
 			"text": "Channel management intro",
@@ -180,6 +268,17 @@
 		"_channelStaticHint": {
 			"type": "staticText",
 			"text": "Channel list static hint",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
+		},
+		"_adminSnapshotChannels": {
+			"type": "text",
+			"label": "Snapshot channels",
+			"readOnly": true,
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,
