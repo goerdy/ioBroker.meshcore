@@ -123,4 +123,4 @@ Not verified end to end:
 
 MIT License
 
-Copyright (c) 2026 goerdy <goerdy@example.com>
+Copyright (c) 2026 goerdy <iobroker@philipp-guerth.de>

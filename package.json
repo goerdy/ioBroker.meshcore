@@ -4,7 +4,7 @@
   "description": "MeshCore companion adapter for ioBroker",
   "author": {
     "name": "goerdy",
-    "email": "goerdy@example.com"
+    "email": "iobroker@philipp-guerth.de"
   },
   "contributors": [],
   "homepage": "https://github.com/goerdy/ioBroker.meshcore",

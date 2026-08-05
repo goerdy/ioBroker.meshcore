@@ -44,7 +44,7 @@
 			"zh-cn": "ioBroker 的 MeshCore 配套适配器"
 		},
 		"authors": [
-			"goerdy <goerdy@example.com>"
+			"goerdy <iobroker@philipp-guerth.de>"
 		],
 		"keywords": [
 			"meshcore",
