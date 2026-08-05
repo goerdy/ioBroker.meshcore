@@ -157,34 +157,15 @@
 			"lg": 12,
 			"xl": 12
 		},
-		"_overviewText": {
-			"type": "textSendTo",
-			"label": "Device overview",
-			"container": "html",
-			"command": "getOverviewText",
-			"defaultSendTo": "getOverviewText",
-			"button": "Refresh overview",
-			"help": "Device overview help",
+		"_overviewStaticHint": {
+			"type": "staticText",
+			"text": "Overview static hint",
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,
 			"md": 12,
 			"lg": 12,
 			"xl": 12
-		},
-		"_overviewQr": {
-			"type": "imageSendTo",
-			"label": "Contact QR code",
-			"command": "getOverviewQrImage",
-			"help": "Contact QR code help",
-			"newLine": true,
-			"width": 320,
-			"height": 320,
-			"xs": 12,
-			"sm": 12,
-			"md": 6,
-			"lg": 4,
-			"xl": 4
 		},
 		"_channelHeader": {
 			"type": "staticText",
@@ -196,14 +177,9 @@
 			"lg": 12,
 			"xl": 12
 		},
-		"_channelList": {
-			"type": "textSendTo",
-			"label": "Known channels on device",
-			"container": "html",
-			"command": "getChannelListText",
-			"defaultSendTo": "getChannelListText",
-			"button": "Refresh channel list",
-			"help": "Known channels on device help",
+		"_channelStaticHint": {
+			"type": "staticText",
+			"text": "Channel list static hint",
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,
