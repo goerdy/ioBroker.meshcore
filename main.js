@@ -1001,7 +1001,7 @@ class Meshcore extends utils.Adapter {
 			throw new Error('Channel name is required');
 		}
 
-		const secretHex = normalizeHex(message?.secretHex);
+		const secretHex = this.normalizeOptionalSecretHex(message?.secretHex);
 		const secret = secretHex ? this.hexToBytes(secretHex) : crypto.randomBytes(16);
 
 		await this.meshConnection.setChannel(rawIndex, channelName, secret);
@@ -1062,6 +1062,24 @@ class Meshcore extends utils.Adapter {
 		}
 
 		return Buffer.from(normalized, 'hex');
+	}
+
+	/**
+	 * @param {unknown} value Raw secret input from admin.
+	 * @returns {string} Normalized hex string or empty string if auto-generation should be used.
+	 */
+	normalizeOptionalSecretHex(value) {
+		const raw = String(value ?? '').trim();
+		if (!raw || raw === 'undefined' || raw === 'null' || raw === 'auto' || raw === 'random') {
+			return '';
+		}
+
+		const normalized = normalizeHex(raw);
+		if (!normalized) {
+			throw new Error('Channel secret must be hexadecimal or left empty for auto-generation');
+		}
+
+		return normalized;
 	}
 
 	/**

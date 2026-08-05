@@ -74,13 +74,9 @@
 			"xl": 4
 		},
 		"subscribedChannels": {
-			"type": "selectSendTo",
+			"type": "text",
 			"label": "Additional channel subscriptions",
 			"help": "Additional channel subscriptions help",
-			"command": "listKnownChannels",
-			"manual": true,
-			"multiple": true,
-			"showAllValues": true,
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,

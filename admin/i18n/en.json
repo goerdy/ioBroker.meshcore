@@ -9,7 +9,7 @@
 	"Store public channel messages": "Store public channel messages",
 	"Store public channel messages help": "If enabled, public channel traffic is written into the adapter object tree.",
 	"Additional channel subscriptions": "Additional channel subscriptions",
-	"Additional channel subscriptions help": "Add extra channels by channel index or exact channel name. Public is always monitored separately.",
+	"Additional channel subscriptions help": "Add extra channels as a text list by channel index or exact channel name. Separate entries with commas, semicolons, or new lines. Public is always monitored separately.",
 	"Sync device time on connect": "Sync device time on connect",
 	"Sync device time on connect help": "Updates the MeshCore companion clock whenever the adapter connects successfully.",
 	"Fallback message poll interval in seconds": "Fallback message poll interval in seconds",

@@ -9,7 +9,7 @@
 	"Store public channel messages": "Öffentliche Channel-Nachrichten speichern",
 	"Store public channel messages help": "Wenn aktiv, wird der öffentliche Channel im Objektbaum des Adapters mitgeschrieben.",
 	"Additional channel subscriptions": "Zusätzliche Channel-Abos",
-	"Additional channel subscriptions help": "Zusätzliche Channels per Index oder exaktem Namen abonnieren. Public wird separat immer behandelt.",
+	"Additional channel subscriptions help": "Zusätzliche Channels als Textliste per Index oder exaktem Namen abonnieren. Einträge mit Komma, Semikolon oder Zeilenumbruch trennen. Public wird separat immer behandelt.",
 	"Sync device time on connect": "Gerätezeit beim Verbinden synchronisieren",
 	"Sync device time on connect help": "Aktualisiert die Uhr des MeshCore-Companion bei jeder erfolgreichen Verbindung.",
 	"Fallback message poll interval in seconds": "Fallback-Abfrageintervall für Nachrichten in Sekunden",
