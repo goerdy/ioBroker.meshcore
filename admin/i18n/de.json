@@ -1,5 +1,23 @@
 {
 	"meshcore adapter settings": "Adaptereinstellungen für meshcore",
-	"option1": "Option1",
-	"option2": "Option2"
+	"MeshCore admin intro": "Hier konfigurierst du die serielle MeshCore-Companion-Verbindung und legst fest, welche Nachrichtenströme in ioBroker gespeichert werden sollen.",
+	"MeshCore admin alpha warning": "Nur Alpha: Dieser Adapter läuft als Testversion, ist aber weiterhin rau, vibe-coded und von keinem Menschen reviewed.",
+	"Open GitHub help and issues": "GitHub-Hilfe und Issues öffnen",
+	"Serial permission hint": "Wenn der Adapter den Port nicht öffnen kann, prüfe bitte die dialout-Gruppenzugehörigkeit des ioBroker-Users und die Geräteberechtigungen auf Host, Container oder VM.",
+	"Serial device": "Serielles Gerät",
+	"Serial device help": "Wähle das MeshCore-USB-Seriellgerät aus. Ein stabiler Pfad unter /dev/serial/by-id ist meist besser als /dev/ttyACM0.",
+	"Store public channel messages": "Öffentliche Channel-Nachrichten speichern",
+	"Store public channel messages help": "Wenn aktiv, wird der öffentliche Channel im Objektbaum des Adapters mitgeschrieben.",
+	"Additional channel subscriptions": "Zusätzliche Channel-Abos",
+	"Additional channel subscriptions help": "Zusätzliche Channels per Index oder exaktem Namen abonnieren. Public wird separat immer behandelt.",
+	"Sync device time on connect": "Gerätezeit beim Verbinden synchronisieren",
+	"Sync device time on connect help": "Aktualisiert die Uhr des MeshCore-Companion bei jeder erfolgreichen Verbindung.",
+	"Fallback message poll interval in seconds": "Fallback-Abfrageintervall für Nachrichten in Sekunden",
+	"Fallback message poll interval in seconds help": "Zusätzliche Abfrage für wartende Nachrichten, falls kein Push-Event ankommt. 0 deaktiviert das Polling.",
+	"Metadata refresh interval in minutes": "Metadaten-Aktualisierung in Minuten",
+	"Metadata refresh interval in minutes help": "Wie oft Kontakte, Channels und Statistiken nach dem Start aktualisiert werden. 0 deaktiviert die zyklische Aktualisierung.",
+	"Reconnect delay in seconds": "Reconnect-Verzögerung in Sekunden",
+	"Reconnect delay in seconds help": "Wartezeit bis zum nächsten Verbindungsversuch nach Disconnect oder Fehler.",
+	"Stored messages per branch": "Gespeicherte Nachrichten pro Zweig",
+	"Stored messages per branch help": "Maximale Anzahl gespeicherter Nachrichten pro Public-, Channel- oder Private-History-Zweig."
 }

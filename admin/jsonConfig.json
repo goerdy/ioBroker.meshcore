@@ -2,9 +2,56 @@
 	"i18n": true,
 	"type": "panel",
 	"items": {
+		"_intro": {
+			"type": "staticText",
+			"text": "MeshCore admin intro",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
+		},
+		"_alpha": {
+			"type": "staticText",
+			"text": "MeshCore admin alpha warning",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
+		},
+		"_repoLink": {
+			"type": "staticLink",
+			"label": "Open GitHub help and issues",
+			"href": "https://github.com/goerdy/ioBroker.meshcore",
+			"target": "_blank",
+			"button": true,
+			"variant": "outlined",
+			"color": "primary",
+			"icon": "help",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
+		},
+		"_serialHint": {
+			"type": "staticText",
+			"text": "Serial permission hint",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
+		},
 		"serialPort": {
 			"type": "selectSendTo",
-			"label": "Serial port",
+			"label": "Serial device",
+			"help": "Serial device help",
 			"newLine": true,
 			"command": "listSerialPorts",
 			"manual": true,
@@ -18,6 +65,7 @@
 		"monitorPublicChannel": {
 			"type": "checkbox",
 			"label": "Store public channel messages",
+			"help": "Store public channel messages help",
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,
@@ -27,7 +75,8 @@
 		},
 		"subscribedChannels": {
 			"type": "selectSendTo",
-			"label": "Additional subscribed channels",
+			"label": "Additional channel subscriptions",
+			"help": "Additional channel subscriptions help",
 			"command": "listKnownChannels",
 			"manual": true,
 			"multiple": true,
@@ -42,6 +91,7 @@
 		"syncTimeOnConnect": {
 			"type": "checkbox",
 			"label": "Sync device time on connect",
+			"help": "Sync device time on connect help",
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,
@@ -51,7 +101,8 @@
 		},
 		"messagePollIntervalSeconds": {
 			"type": "number",
-			"label": "Message poll fallback in seconds",
+			"label": "Fallback message poll interval in seconds",
+			"help": "Fallback message poll interval in seconds help",
 			"min": 0,
 			"step": 1,
 			"newLine": true,
@@ -63,7 +114,8 @@
 		},
 		"statsRefreshMinutes": {
 			"type": "number",
-			"label": "Refresh metadata every X minutes",
+			"label": "Metadata refresh interval in minutes",
+			"help": "Metadata refresh interval in minutes help",
 			"min": 0,
 			"step": 1,
 			"newLine": true,
@@ -76,6 +128,7 @@
 		"reconnectDelaySeconds": {
 			"type": "number",
 			"label": "Reconnect delay in seconds",
+			"help": "Reconnect delay in seconds help",
 			"min": 5,
 			"step": 1,
 			"newLine": true,
@@ -87,7 +140,8 @@
 		},
 		"maxHistoryEntries": {
 			"type": "number",
-			"label": "Maximum stored messages per branch",
+			"label": "Stored messages per branch",
+			"help": "Stored messages per branch help",
 			"min": 1,
 			"step": 1,
 			"newLine": true,

@@ -1,5 +1,23 @@
 {
 	"meshcore adapter settings": "Adapter settings for meshcore",
-	"option1": "option1",
-	"option2": "option2"
+	"MeshCore admin intro": "Configure the MeshCore serial companion connection and decide which message streams should be stored in ioBroker.",
+	"MeshCore admin alpha warning": "Alpha only: this adapter is running as a test build, but it is still rough, vibe-coded, and not human-reviewed.",
+	"Open GitHub help and issues": "Open GitHub help and issues",
+	"Serial permission hint": "If the adapter cannot open the port, make sure the ioBroker user is in the dialout group and that the device permissions inside your host, container, or VM are correct.",
+	"Serial device": "Serial device",
+	"Serial device help": "Choose the MeshCore USB serial device. A stable path under /dev/serial/by-id is usually safer than /dev/ttyACM0.",
+	"Store public channel messages": "Store public channel messages",
+	"Store public channel messages help": "If enabled, public channel traffic is written into the adapter object tree.",
+	"Additional channel subscriptions": "Additional channel subscriptions",
+	"Additional channel subscriptions help": "Add extra channels by channel index or exact channel name. Public is always monitored separately.",
+	"Sync device time on connect": "Sync device time on connect",
+	"Sync device time on connect help": "Updates the MeshCore companion clock whenever the adapter connects successfully.",
+	"Fallback message poll interval in seconds": "Fallback message poll interval in seconds",
+	"Fallback message poll interval in seconds help": "Extra polling interval for waiting messages if no push event arrives. Set to 0 to disable polling.",
+	"Metadata refresh interval in minutes": "Metadata refresh interval in minutes",
+	"Metadata refresh interval in minutes help": "How often the adapter refreshes contacts, channels, and stats after startup. Set to 0 to disable periodic refresh.",
+	"Reconnect delay in seconds": "Reconnect delay in seconds",
+	"Reconnect delay in seconds help": "Delay before the next reconnect attempt after a disconnect or connection error.",
+	"Stored messages per branch": "Stored messages per branch",
+	"Stored messages per branch help": "Maximum number of messages kept in each public, channel, or private history branch."
 }
