@@ -57,6 +57,31 @@ Depending on your admin version, this is typically done via the custom installat
 - Add additional subscribed channels by channel index or exact name.
 - Adjust reconnect delay, fallback polling interval, stats refresh, and message history size as needed.
 
+## Serial Device Permissions
+
+If the adapter reports a serial error like:
+
+```text
+Permission denied, cannot open /dev/ttyACM0
+```
+
+then the serial device exists, but the ioBroker process cannot open it yet.
+
+On Linux systems the device often needs group ownership and mode like this:
+
+```bash
+chgrp dialout /dev/ttyACM0
+chmod 660 /dev/ttyACM0
+```
+
+This fixed the issue in a Proxmox LXC setup where the USB serial device had already been passed through to the container.
+
+Notes:
+
+- The ioBroker runtime user should usually be a member of `dialout`.
+- In Proxmox LXC, device passthrough alone may not be enough if the device permissions inside the container are still too restrictive.
+- `/dev/ttyACM0` may change after reconnects or reboots. If available, a stable path under `/dev/serial/by-id/` is usually the better choice.
+
 ## Development
 
 ```bash
