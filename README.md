@@ -1,6 +1,6 @@
 ![Logo](admin/meshcore.png)
 
-# ioBroker.MeshCore
+# ioBroker.meshcore
 
 MeshCore companion adapter for ioBroker with serial connection setup, metadata sync, public channel storage, additional channel subscriptions, and private message history.
 
@@ -45,7 +45,7 @@ This repository is intended to be installable directly from the ioBroker admin w
 After the repository is published, install it in ioBroker admin using the GitHub URL:
 
 ```text
-https://github.com/goerdy/ioBroker.MeshCore
+https://github.com/goerdy/ioBroker.meshcore
 ```
 
 Depending on your admin version, this is typically done via the custom installation dialog in the adapters page.
