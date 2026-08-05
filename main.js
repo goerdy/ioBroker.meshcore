@@ -867,7 +867,7 @@ class Meshcore extends utils.Adapter {
 			}
 
 			if (obj.command === 'getOverviewText') {
-				const overview = await this.queueOperation(() => this.buildOverview());
+				const overview = await this.queueOperation(() => this.buildOverview({ refreshDevice: true }));
 				const result = this.renderOverviewHtml(overview);
 				if (obj.callback) {
 					this.sendTo(obj.from, obj.command, result, obj.callback);
@@ -876,7 +876,7 @@ class Meshcore extends utils.Adapter {
 			}
 
 			if (obj.command === 'getOverviewQrImage') {
-				const overview = await this.queueOperation(() => this.buildOverview());
+				const overview = await this.queueOperation(() => this.buildOverview({ refreshDevice: true }));
 				const result = overview?.qr?.dataUrl || '';
 				if (obj.callback) {
 					this.sendTo(obj.from, obj.command, result, obj.callback);
@@ -885,7 +885,7 @@ class Meshcore extends utils.Adapter {
 			}
 
 			if (obj.command === 'getChannelListText') {
-				const overview = await this.queueOperation(() => this.buildOverview());
+				const overview = await this.queueOperation(() => this.buildOverview({ refreshDevice: true }));
 				const result = this.renderChannelListHtml(overview);
 				if (obj.callback) {
 					this.sendTo(obj.from, obj.command, result, obj.callback);
@@ -915,7 +915,11 @@ class Meshcore extends utils.Adapter {
 		}
 	}
 
-	async buildOverview() {
+	async buildOverview(options = {}) {
+		if (options.refreshDevice) {
+			await this.refreshOverviewCachesFromDevice();
+		}
+
 		const [selfState, deviceState, statsState, connectionState, errorState] = await Promise.all([
 			this.getJsonStateValue('meta.self', {}),
 			this.getJsonStateValue('meta.device', {}),
@@ -960,6 +964,30 @@ class Meshcore extends utils.Adapter {
 		}
 
 		return overview;
+	}
+
+	async refreshOverviewCachesFromDevice() {
+		if (!this.meshConnection || !this.connectionReady) {
+			return;
+		}
+
+		const [selfInfo, deviceInfo, contacts, channels] = await Promise.all([
+			this.meshConnection.getSelfInfo(),
+			this.meshConnection.deviceQuery(this.meshConstants.SupportedCompanionProtocolVersion),
+			this.meshConnection.getContacts(),
+			this.meshConnection.getChannels(),
+		]);
+
+		await this.storeSelfInfo(selfInfo);
+		await this.storeDeviceInfo(deviceInfo);
+		await this.storeContacts(contacts);
+		await this.storeChannels(channels);
+		await this.refreshStats();
+		await this.setStateAsync('info.lastSync', {
+			val: new Date().toISOString(),
+			ack: true,
+		});
+		await this.updateDynamicTargetsStates();
 	}
 
 	async buildContactQr(selfState) {
