@@ -8,6 +8,10 @@ MeshCore companion adapter for ioBroker with serial connection setup, metadata s
 
 This adapter is an absolute, untested alpha.
 
+It currently runs far enough to count as a test version, but it is still absolutely rough and should be treated as experimental murks.
+
+It is also completely vibe-coded so far, and no human has reviewed the code yet.
+
 - It has not been validated against a real production ioBroker system.
 - It has not been validated against real MeshCore hardware end to end.
 - Object model, admin config, message flow, and reconnect handling may still change.
