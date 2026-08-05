@@ -5,6 +5,16 @@ if (typeof goog !== 'undefined') {
 	goog.require('Blockly.JavaScript');
 }
 
+if (typeof Blockly === 'undefined') {
+	throw new Error('Blockly is not available for MeshCore custom blocks');
+}
+
+Blockly.Words = Blockly.Words || {};
+Blockly.CustomBlocks = Blockly.CustomBlocks || [];
+if (!Blockly.CustomBlocks.includes('Sendto')) {
+	Blockly.CustomBlocks.push('Sendto');
+}
+
 Blockly.Translate =
 	Blockly.Translate ||
 	function (word, lang) {
