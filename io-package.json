@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "meshcore",
-		"version": "0.0.3",
+		"version": "0.0.4",
 		"news": {
+			"0.0.4": {
+				"en": "fixed device stats collection (getStatsCore/getStatsRadio/getStatsPackets) — stats were never populated and the initial sync aborted with a TypeError",
+				"de": "Statistikabfrage korrigiert (getStatsCore/getStatsRadio/getStatsPackets) — Statistiken wurden nie befüllt und der Initial-Sync brach mit TypeError ab",
+				"ru": "исправлен сбор статистики устройства (getStatsCore/getStatsRadio/getStatsPackets) — статистика никогда не заполнялась, а начальная синхронизация прерывалась TypeError",
+				"pt": "corrigida a recolha de estatísticas do dispositivo (getStatsCore/getStatsRadio/getStatsPackets) — as estatísticas nunca eram preenchidas e a sincronização inicial abortava com TypeError",
+				"nl": "apparaatstatistieken hersteld (getStatsCore/getStatsRadio/getStatsPackets) — statistieken werden nooit gevuld en de initiële synchronisatie brak af met TypeError",
+				"fr": "correction de la collecte des statistiques de l'appareil (getStatsCore/getStatsRadio/getStatsPackets) — les statistiques n'étaient jamais remplies et la synchro initiale échouait avec TypeError",
+				"it": "corretta la raccolta delle statistiche del dispositivo (getStatsCore/getStatsRadio/getStatsPackets) — le statistiche non venivano mai compilate e la sincronizzazione iniziale si interrompeva con TypeError",
+				"es": "se corrigió la recolección de estadísticas del dispositivo (getStatsCore/getStatsRadio/getStatsPackets) — las estadísticas nunca se llenaban y la sincronización inicial abortaba con TypeError",
+				"pl": "naprawiono zbieranie statystyk urządzenia (getStatsCore/getStatsRadio/getStatsPackets) — statystyki nigdy nie były wypełniane, a synchronizacja początkowa kończyła się błędem TypeError",
+				"uk": "виправлено збір статистики пристрою (getStatsCore/getStatsRadio/getStatsPackets) — статистика ніколи не заповнювалася, а початкова синхронізація переривалася з TypeError",
+				"zh-cn": "修复设备统计采集（getStatsCore/getStatsRadio/getStatsPackets）——统计从未填充，初始同步会因 TypeError 中断"
+			},
 			"0.0.3": {
 				"en": "added stale-connection watchdog: detects frozen serial devices, reconnects automatically, and exposes a configurable stale timeout",
 				"de": "Stale-Watchdog hinzugefügt: erkennt eingefrorene serielle Geräte, verbindet automatisch neu und bietet einen konfigurierbaren Timeout",

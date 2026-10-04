@@ -520,9 +520,9 @@ class Meshcore extends utils.Adapter {
 		}
 
 		const [coreStats, radioStats, packetStats, battery] = await Promise.all([
-			this.meshConnection.getCoreStats(),
-			this.meshConnection.getRadioStats(),
-			this.meshConnection.getPacketStats(),
+			this.meshConnection.getStatsCore(),
+			this.meshConnection.getStatsRadio(),
+			this.meshConnection.getStatsPackets(),
 			this.meshConnection.getBatteryVoltage(),
 		]);
 
