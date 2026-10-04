@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "meshcore",
-		"version": "0.0.2",
+		"version": "0.0.3",
 		"news": {
+			"0.0.3": {
+				"en": "added stale-connection watchdog: detects frozen serial devices, reconnects automatically, and exposes a configurable stale timeout",
+				"de": "Stale-Watchdog hinzugefügt: erkennt eingefrorene serielle Geräte, verbindet automatisch neu und bietet einen konfigurierbaren Timeout",
+				"ru": "добавлен контроль зависшего соединения: определяет замороженные последовательные устройства, автоматически переподключается и предоставляет настраиваемый тайм-аут",
+				"pt": "adicionado watchdog de conexão congelada: deteta dispositivos série bloqueados, volta a ligar automaticamente e disponibiliza um tempo limite configurável",
+				"nl": "watchdog voor vastgelopen verbinding toegevoegd: detecteert bevroren seriële apparaten, verbindt automatisch opnieuw en biedt een instelbare time-out",
+				"fr": "ajout d'un watchdog de connexion figée : détecte les périphériques série bloqués, se reconnecte automatiquement et propose un délai configurable",
+				"it": "aggiunto watchdog per connessioni bloccate: rileva dispositivi seriali congelati, si riconnette automaticamente e offre un timeout configurabile",
+				"es": "se añadió un vigilante de conexión congelada: detecta dispositivos serie bloqueados, reconecta automáticamente y ofrece un tiempo de espera configurable",
+				"pl": "dodano watchdog zawieszonego połączenia: wykrywa zamrożone urządzenia szeregowe, automatycznie wznawia połączenie i oferuje konfigurowalny limit czasu",
+				"uk": "додано наглядача за завислим з'єднанням: виявляє заморожені послідовні пристрої, автоматично перепідключається та надає налаштовуваний тайм-аут",
+				"zh-cn": "新增冻结连接看门狗：检测已冻结的串口设备，自动重新连接，并提供可配置的超时时间"
+			},
 			"0.0.2": {
 				"en": "added README screenshots, Blockly documentation, and legacy Blockly compatibility flag",
 				"de": "README-Screenshots, Blockly-Dokumentation und Legacy-Blockly-Kompatibilitätsflag hinzugefügt",
