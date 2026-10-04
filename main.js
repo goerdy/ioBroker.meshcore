@@ -26,6 +26,9 @@ class Meshcore extends utils.Adapter {
 		this.subscribedChannelConfig = parseSubscribedChannels([]);
 		this.maxHistoryEntries = 50;
 		this.connectAttemptId = 0;
+		this.lastActivityAt = 0;
+		this.staleCheckInterval = null;
+		this.pendingDisconnectReason = null;
 
 		this.on('ready', this.onReady.bind(this));
 		this.on('stateChange', this.onStateChange.bind(this));
@@ -219,7 +222,48 @@ class Meshcore extends utils.Adapter {
 		const run = async () => task();
 		const operation = this.operationChain.then(run, run);
 		this.operationChain = operation.catch(() => undefined);
+		// Jede erfolgreich abgeschlossene Operation ist ein Lebenszeichen des Geräts.
+		void operation.then(
+			() => {
+				this.lastActivityAt = Date.now();
+			},
+			() => {},
+		);
 		return operation;
+	}
+
+	checkStaleConnection() {
+		if (!this.connectionReady || !this.meshConnection) {
+			return;
+		}
+		const timeoutSec = Math.max(60, Number(this.config.staleTimeoutSeconds) || 120);
+		const idleMs = Date.now() - this.lastActivityAt;
+		if (idleMs < timeoutSec * 1000) {
+			return;
+		}
+		const reason = `no device response for ${Math.round(idleMs / 1000)}s — forcing reconnect`;
+		this.log.error(`MeshCore stale connection: ${reason}`);
+		this.pendingDisconnectReason = reason;
+		this.connectionReady = false;
+		// Hängende Operationen (z. B. ein Poll, der nie antwortet) loslassen,
+		// sonst blockieren sie die Operation-Chain nach dem Reconnect für immer.
+		this.operationChain = Promise.resolve();
+		const forceDisconnect = () => {
+			void this.closeCurrentConnection().finally(() => this.handleDisconnected(reason));
+		};
+		const port = this.meshConnection?.serialPort;
+		if (port?.isOpen) {
+			const fallback = setTimeout(forceDisconnect, 5000);
+			port.close(err => {
+				clearTimeout(fallback);
+				if (err) {
+					this.log.warn(`MeshCore stale close failed: ${err.message}`);
+					forceDisconnect();
+				}
+			});
+		} else {
+			forceDisconnect();
+		}
 	}
 
 	scheduleReconnect(reason) {
@@ -330,6 +374,7 @@ class Meshcore extends utils.Adapter {
 
 		this.log.info(`MeshCore serial connection opened on ${this.config.serialPort}`);
 		this.connectionReady = true;
+		this.lastActivityAt = Date.now();
 		await this.setStateAsync('info.connection', { val: true, ack: true });
 		await this.setStateAsync('info.lastError', { val: '', ack: true });
 		await this.setStateAsync('info.lastConnect', {
@@ -337,8 +382,25 @@ class Meshcore extends utils.Adapter {
 			ack: true,
 		});
 
-		await this.initialSync();
+		// Watchdog & Intervalle VOR dem Initial-Sync starten: Wenn das Gerät auf
+		// keine Anfrage antwortet, hängt der Sync sonst ewig und der Adapter
+		// bliebe als „grün, aber tot" stehen.
 		this.startIntervals();
+
+		try {
+			await this.initialSync();
+		} catch (error) {
+			const message = error?.message || String(error);
+			this.log.error(`MeshCore initial sync failed: ${message}`);
+			await this.setStateAsync('info.lastError', { val: `initial sync failed: ${message}`, ack: true });
+			await this.setStateAsync('info.connection', { val: false, ack: true });
+			this.connectionReady = false;
+			// Hängende Sync-Operationen aus der Kette nehmen, sonst blockieren sie alles Weitere.
+			this.operationChain = Promise.resolve();
+			this.stopIntervals();
+			await this.closeCurrentConnection();
+			this.scheduleReconnect(`initial sync failed: ${message}`);
+		}
 	}
 
 	async initialSync() {
@@ -387,6 +449,14 @@ class Meshcore extends utils.Adapter {
 				statsMinutes * 60 * 1000,
 			);
 		}
+
+		this.staleCheckInterval = setInterval(() => {
+			try {
+				this.checkStaleConnection();
+			} catch (error) {
+				this.log.warn(`MeshCore stale check failed: ${error?.message || error}`);
+			}
+		}, 30_000);
 	}
 
 	stopIntervals() {
@@ -399,15 +469,22 @@ class Meshcore extends utils.Adapter {
 			clearInterval(this.statsInterval);
 			this.statsInterval = null;
 		}
+
+		if (this.staleCheckInterval) {
+			clearInterval(this.staleCheckInterval);
+			this.staleCheckInterval = null;
+		}
 	}
 
 	async handleDisconnected(reason) {
+		const shownReason = this.pendingDisconnectReason || reason;
+		this.pendingDisconnectReason = null;
 		this.connectionReady = false;
 		this.stopIntervals();
-		this.log.warn(`MeshCore disconnected: ${reason}`);
+		this.log.warn(`MeshCore disconnected: ${shownReason}`);
 		await this.setStateAsync('info.connection', { val: false, ack: true });
-		await this.setStateAsync('info.lastError', { val: reason, ack: true });
-		this.scheduleReconnect(reason);
+		await this.setStateAsync('info.lastError', { val: shownReason, ack: true });
+		this.scheduleReconnect(shownReason);
 	}
 
 	async handleConnectionError(error) {
