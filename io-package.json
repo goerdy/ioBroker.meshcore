@@ -1,7 +1,7 @@
 {
 	"common": {
 		"name": "meshcore",
-		"version": "0.0.4",
+		"version": "0.0.5",
 		"news": {
 			"0.0.4": {
 				"en": "fixed device stats collection (getStatsCore/getStatsRadio/getStatsPackets) — stats were never populated and the initial sync aborted with a TypeError",
@@ -54,6 +54,19 @@
 				"pl": "Pierwsze wydanie",
 				"uk": "Початкова версія",
 				"zh-cn": "首次出版"
+			},
+			"0.0.5": {
+				"en": "added exponential reconnect backoff (up to 5 min) — rapid open/close cycles can stall the device's USB-CDC endpoint until the next power cycle",
+				"de": "exponentieller Reconnect-Backoff hinzugefügt (bis 5 min) — rasche Open/Close-Zyklen können den USB-CDC-Endpunkt des Geräts blockieren, bis zum nächsten Power-Cycle",
+				"ru": "добавлен экспоненциальный откат при переподключении (до 5 мин) — частые циклы открытия/закрытия могут заблокировать USB-CDC-конечную точку устройства до следующего цикла питания",
+				"pt": "adicionado backoff exponencial de reconexão (até 5 min) — ciclos rápidos de abertura/fecho podem bloquear o endpoint USB-CDC do dispositivo até ao próximo ciclo de energia",
+				"nl": "exponentiële reconnect-backoff toegevoegd (tot 5 min) — snelle open/sluit-cycli kunnen de USB-CDC-endpoint van het apparaat blokkeren tot de volgende stroomcyclus",
+				"fr": "ajout d'un backoff exponentiel de reconnexion (jusqu'à 5 min) — des cycles rapides d'ouverture/fermeture peuvent bloquer le point de terminaison USB-CDC de l'appareil jusqu'au prochain cycle d'alimentation",
+				"it": "aggiunto backoff esponenziale di riconnessione (fino a 5 min) — cicli rapidi di apertura/chiusura possono bloccare l'endpoint USB-CDC del dispositivo fino al prossimo ciclo di alimentazione",
+				"es": "se añadió retroceso exponencial de reconexión (hasta 5 min): los ciclos rápidos de apertura/cierre pueden bloquear el endpoint USB-CDC del dispositivo hasta el siguiente ciclo de energía",
+				"pl": "dodano wykładnicze wycofywanie ponownego łączenia (do 5 min) — szybkie cykle otwierania/zamykania mogą zablokować punkt końcowy USB-CDC urządzenia do następnego cyklu zasilania",
+				"uk": "додано експоненційну затримку перепідключення (до 5 хв) — часті цикли відкриття/закриття можуть заблокувати USB-CDC-кінцеву точку пристрою до наступного циклу живлення",
+				"zh-cn": "新增指数退避重连（最长 5 分钟）——频繁的打开/关闭循环可能导致设备的 USB-CDC 端点停滞，直到下次断电重启"
 			}
 		},
 		"titleLang": {

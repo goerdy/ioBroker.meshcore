@@ -26,6 +26,7 @@ class Meshcore extends utils.Adapter {
 		this.subscribedChannelConfig = parseSubscribedChannels([]);
 		this.maxHistoryEntries = 50;
 		this.connectAttemptId = 0;
+		this.consecutiveConnectFailures = 0;
 		this.lastActivityAt = 0;
 		this.staleCheckInterval = null;
 		this.pendingDisconnectReason = null;
@@ -245,6 +246,7 @@ class Meshcore extends utils.Adapter {
 		this.log.error(`MeshCore stale connection: ${reason}`);
 		this.pendingDisconnectReason = reason;
 		this.connectionReady = false;
+		this.consecutiveConnectFailures++;
 		// Hängende Operationen (z. B. ein Poll, der nie antwortet) loslassen,
 		// sonst blockieren sie die Operation-Chain nach dem Reconnect für immer.
 		this.operationChain = Promise.resolve();
@@ -271,8 +273,16 @@ class Meshcore extends utils.Adapter {
 			return;
 		}
 
-		const delay = Math.max(5, Number(this.config.reconnectDelaySeconds) || 15) * 1000;
-		this.log.info(`Reconnecting to MeshCore in ${delay / 1000}s (${reason})`);
+		// Exponentieller Backoff: Rasche Open/Close-Zyklen bringen den USB-CDC-
+		// Endpunkt des Boards zum Stillstand (Gerät antwortet dann nur nach
+		// physischem Power-Cycle wieder). Nach erfolgreichem Sync wird der
+		// Zähler zurückgesetzt.
+		const baseDelay = Math.max(5, Number(this.config.reconnectDelaySeconds) || 15);
+		const delay = Math.min(300_000, baseDelay * 1000 * Math.pow(2, Math.min(this.consecutiveConnectFailures, 8)));
+		this.log.info(
+			`Reconnecting to MeshCore in ${Math.round(delay / 1000)}s ` +
+				`(attempt ${this.consecutiveConnectFailures + 1}, ${reason})`,
+		);
 		this.reconnectTimeout = setTimeout(async () => {
 			this.reconnectTimeout = null;
 			await this.connectMeshCore();
@@ -389,12 +399,14 @@ class Meshcore extends utils.Adapter {
 
 		try {
 			await this.initialSync();
+			this.consecutiveConnectFailures = 0;
 		} catch (error) {
 			const message = error?.message || String(error);
 			this.log.error(`MeshCore initial sync failed: ${message}`);
 			await this.setStateAsync('info.lastError', { val: `initial sync failed: ${message}`, ack: true });
 			await this.setStateAsync('info.connection', { val: false, ack: true });
 			this.connectionReady = false;
+			this.consecutiveConnectFailures++;
 			// Hängende Sync-Operationen aus der Kette nehmen, sonst blockieren sie alles Weitere.
 			this.operationChain = Promise.resolve();
 			this.stopIntervals();
@@ -489,6 +501,7 @@ class Meshcore extends utils.Adapter {
 
 	async handleConnectionError(error) {
 		this.connectionReady = false;
+		this.consecutiveConnectFailures++;
 		const message = error?.message || String(error);
 		this.log.error(`MeshCore connect failed: ${message}`);
 		await this.setStateAsync('info.connection', { val: false, ack: true });

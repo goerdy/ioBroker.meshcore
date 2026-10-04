@@ -1,6 +1,6 @@
 {
   "name": "iobroker.meshcore",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "MeshCore companion adapter for ioBroker",
   "author": {
     "name": "goerdy",
