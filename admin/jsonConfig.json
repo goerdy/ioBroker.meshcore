@@ -134,6 +134,20 @@
 			"lg": 4,
 			"xl": 3
 		},
+		"staleTimeoutSeconds": {
+			"type": "number",
+			"label": "Stale connection timeout in seconds",
+			"help": "Stale connection timeout in seconds help",
+			"min": 60,
+			"default": 120,
+			"step": 1,
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 3
+		},
 		"maxHistoryEntries": {
 			"type": "number",
 			"label": "Stored messages per branch",

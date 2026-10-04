@@ -18,6 +18,8 @@
 	"Metadata refresh interval in minutes help": "Wie oft Kontakte, Channels und Statistiken nach dem Start aktualisiert werden. 0 deaktiviert die zyklische Aktualisierung.",
 	"Reconnect delay in seconds": "Reconnect-Verzögerung in Sekunden",
 	"Reconnect delay in seconds help": "Wartezeit bis zum nächsten Verbindungsversuch nach Disconnect oder Fehler.",
+	"Stale connection timeout in seconds": "Timeout bei eingefrorener Verbindung (Sekunden)",
+	"Stale connection timeout in seconds help": "Meldet sich das Gerät so viele Sekunden lang nicht, gilt die Verbindung als eingefroren: Der Port wird geschlossen, der Fehler protokolliert und automatisch neu verbunden.",
 	"Stored messages per branch": "Gespeicherte Nachrichten pro Zweig",
 	"Stored messages per branch help": "Maximale Anzahl gespeicherter Nachrichten pro Public-, Channel- oder Private-History-Zweig.",
 	"Overview section intro": "Live-Übersicht aus der laufenden Adapterinstanz. Hier siehst du Verbindungsdetails, Identitätsdaten, QR-Export und die aktuell bekannten Channels auf dem MeshCore-Gerät.",

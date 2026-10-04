@@ -18,6 +18,8 @@
 	"Metadata refresh interval in minutes help": "How often the adapter refreshes contacts, channels, and stats after startup. Set to 0 to disable periodic refresh.",
 	"Reconnect delay in seconds": "Reconnect delay in seconds",
 	"Reconnect delay in seconds help": "Delay before the next reconnect attempt after a disconnect or connection error.",
+	"Stale connection timeout in seconds": "Stale connection timeout in seconds",
+	"Stale connection timeout in seconds help": "If the device sends nothing for this many seconds, the connection is treated as frozen: the port is closed, the error is logged, and the adapter reconnects automatically.",
 	"Stored messages per branch": "Stored messages per branch",
 	"Stored messages per branch help": "Maximum number of messages kept in each public, channel, or private history branch.",
 	"Overview section intro": "Live overview from the running adapter instance. Use this area to inspect connection details, identity data, QR export, and the currently known channels on the MeshCore device.",
